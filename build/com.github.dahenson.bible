@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import signal
+
+# Make sure we'll find the pygobject module, even in JHBuild
+sys.path.insert(1, '/usr/local/usr/lib/python3.5')
+# Make sure we'll find the bible modules, even in JHBuild
+sys.path.insert(1, '/usr/local/lib/python3.5/site-packages')
+
+from gi.repository import Gio
+
+from bible.application import Application
+
+app = Application()
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+exit_status = app.run(sys.argv)
+sys.exit(exit_status)

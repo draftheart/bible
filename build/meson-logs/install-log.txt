@@ -1,0 +1,13 @@
+# List of files installed by Meson
+# Does not contain files installed by custom scripts.
+/usr/local/lib/python3.5/site-packages/bible/LibraryList.pyc
+/usr/local/lib/python3.5/site-packages/bible/application.pyc
+/usr/local/lib/python3.5/site-packages/bible/__init__.py
+/usr/local/lib/python3.5/site-packages/bible/application.py
+/usr/local/lib/python3.5/site-packages/bible/booklist.pyc
+/usr/local/lib/python3.5/site-packages/bible/window.pyc
+/usr/local/lib/python3.5/site-packages/bible/booklist.py
+/usr/local/lib/python3.5/site-packages/bible/__init__.pyc
+/usr/local/lib/python3.5/site-packages/bible/window.py
+/usr/local/share/glib-2.0/schemas/com.github.dahenson.bible.gschema.xml
+/usr/local/bin/com.github.dahenson.bible

@@ -1,0 +1,24 @@
+Build started at 2017-10-12T10:17:23.509087
+Python binary: /usr/bin/python3
+Python system: Linux
+The Meson build system
+Version: 0.40.0
+Source dir: /home/localhero/Projects/Python/bible
+Build dir: /home/localhero/Projects/Python/bible/build
+Build type: native build
+Project name: bible
+Build machine cpu family: x86_64
+Build machine cpu: x86_64
+Message: Looking for dependencies
+Message: Found python3 binary
+Found pkg-config: /usr/bin/pkg-config (0.29.1)
+Determining dependency 'glib-2.0' with pkg-config executable '/usr/bin/pkg-config'
+Native dependency glib-2.0 found: YES 2.48.2
+Determining dependency 'gtk+-3.0' with pkg-config executable '/usr/bin/pkg-config'
+Native dependency gtk+-3.0 found: YES 3.18.9
+Message: Compiling schemas
+Program glib-compile-schemas found: YES (/usr/bin/glib-compile-schemas)
+Message: Preparing init file
+Configuring com.github.dahenson.bible using configuration
+Program meson_post_install.py found: YES (/usr/bin/env python3 /home/localhero/Projects/Python/bible/meson_post_install.py)
+Build targets in project: 1
