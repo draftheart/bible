@@ -20,7 +20,7 @@ class Library():
                 {}
                 </div>
             </body>
-        </html
+        </html>
         """
 
     def _make_mod_lists(self):
@@ -75,7 +75,7 @@ class Library():
         self._vk.setVerse(verse)
 
     def render_chapter(self):
-        buf = '<h1>{} {}</h1>'.format(self.get_book_name(), self.get_chapter())
+        buf = '<h2>{} {}</h2>'.format(self.get_book_name(), self.get_chapter())
 
         for v in range(1, self._vk.getVerseMax()):
             self._vk.setVerse(v)

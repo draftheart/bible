@@ -16,48 +16,39 @@ class PassageView(Gtk.Grid):
             :root {
                 font-family: 'Open Sans', 'sans-serif';
                 color: #333;
-
-              --h0: 4.5rem;
-              --h1: 3rem;
-              --h2: 2.25rem;
-              --h3: 1.5rem;
-              --h4: 1.125rem;
-              --h5: .75rem;
-
-              --lh: calc(4/3);
-              --mx: 32em;
-
-              --m1: calc(2/3 * 1em);
-              --m2: calc(4/3 * 1em);
-              --m3: calc(8/3 * 1em);
-              --m4: calc(16/3 * 1em);
-              --x1: .5rem;
-              --x2: 1rem;
-              --x3: 2rem;
-              --x4: 4rem;
-              --x5: 8rem;
-              --x6: 16rem;
+                font-size: 100%;
             }
             .main {
-                max-width: var(--mx);
+                max-width: 32rem;
                 word-wrap: break-word;
-                margin: var(--m2) auto;
-                padding: 0 var(--x2) var(--x4) var(--x2);
-                line-height: var(--lh);
+                line-height: 1.5rem;
+                margin: 0 auto 4rem auto;
+                padding: 0 1rem 0 1rem;
             }
             span.verse-num {
                 color: #999;
-                font-size: var(--h5);
+                font-size: .75rem;
                 font-weight: bold;
-                padding-right: .15em;
-                padding-left: .25em;
+                padding-right: .15rem;
+                padding-left: .25rem;
                 vertical-align: text-top;
             }
-            .wordsOfJesus { color: red; }
-            .indent1 { margin-left: var(--x1); }
-            .indent2 { margin-left: var(--x2); }
-            .indent3 { margin-left: var(--x3); }
-            .indent4 { margin-left: var(--x4); }
+            h1 { font-size: 2rem }
+            h2 { font-size: 1.5rem }
+            h3 {
+                font-size: 1.125rem;
+                font-weight: lighter;
+            }
+            h4 { font-size: 1rem }
+            h5 { font-size: .875rem }
+            h6 { font-size: .75rem }
+            .mx-auto { margin-left: auto; margin-right: auto; }
+            .divineName { font-variant: small-caps; }
+            .wordsOfJesus { color: #7a0000 }
+            .indent1 { margin-left: .5rem }
+            .indent2 { margin-left: 1rem }
+            .indent3 { margin-left: 2rem }
+            .indent4 { margin-left: 4rem }
         """
         user_style = WebKit2.UserStyleSheet(stylesheet,
             WebKit2.UserContentInjectedFrames.ALL_FRAMES,
