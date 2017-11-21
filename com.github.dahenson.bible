@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+
+import os
+import optparse
+import sys
+import signal
+import gi
+gi.require_version('Gtk', '3.0')
+
+from gi.repository import Gio
+from bible.application import Application
+from bible.defs import VERSION
+
+import bible
+
+if __name__ == '__main__':
+    parser = optparse.OptionParser(version=VERSION)
+    parser.add_option('-p', '--prefix',
+                      help='Installation prefix (for gsettings schema, themes, etc)',
+                      metavar='[/, /usr]')
+    options, args = parser.parse_args()
+
+if options.prefix or not _defs_present:
+    _prefix = options.prefix or '/usr'
+    DATA_DIR = os.path.join(_prefix, 'share')
+    LOCALE_DIR = Os.path.join(_prefix, 'share', 'locale')
+    GSETTINGS_SCHEMA_DIR = os.path.join(_prefix, 'share', 'glib-2.0', 'schemas')
+    _me = os.path.abspath(os.path.dirname(__file__))
+    PKG_DATA_DIR = os.path.join(_me, 'data')
+
+bible.GSETTINGS_SCHEMA_DIR = GSETTINGS_SCHEMA_DIR
+bible.DATA_DIR = DATA_DIR
+bible.PKG_DATA_DIR = PKG_DATA_DIR
+bible.LOCALE_DIR = LOCALE_DIR
+bible.APP_NAME = 'com.github.dahenson.bible'
+
+# Make sure we'll find the pygobject module, even in JHBuild
+sys.path.insert(1, '@PYTHON_EXEC_DIR@')
+# Make sure we'll find the bible modules, even in JHBuild
+sys.path.insert(1, '@PYTHON_DIR@')
+
+app = Application()
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+exit_status = app.run(None)
+sys.exit(exit_status)

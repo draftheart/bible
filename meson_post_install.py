@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import sysconfig
+from compileall import compile_dir
 from os import environ, path
 from subprocess import call
 
@@ -8,5 +10,9 @@ datadir = path.join(prefix, 'share')
 destdir = environ.get('DESTDIR', '')
 
 if not destdir:
-    print("Installing new Schemas")
+    print('Installing new Schemas')
     call(['glib-compile-schemas', path.join(datadir, 'glib-2.0/schemas')])
+
+print('Compiling python bytecode...')
+moduledir = sysconfig.get_path('purelib', vars={'base': str(prefix)})
+compile_dir(destdir + path.join(moduledir, 'bible'), optimize=2)
