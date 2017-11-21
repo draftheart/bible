@@ -2,37 +2,79 @@
 import gi
 gi.require_version('Gtk', '3.0')
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 from gettext import gettext as _
 
 class NavBar(Gtk.Revealer):
 
     def __init__(self):
+        self.css = str("""
+            .bible-navbar GtkToolbar {
+                border: none;
+                border-radius: 4px;
+                background-color: #333;
+                background-image: none;
+            }
+            .bible-navbar GtkLabel {
+                color: #fff;
+            }
+            .bible-navbar GtkImage {
+                color: alpha (#fff, 0.8);
+            }
+            .bible-navbar GtkToolButton {
+                color: #fff;
+                background-color: transparent;
+            }
+        """)
+
         Gtk.Revealer.__init__(self,
             margin=12,
             halign=Gtk.Align.CENTER,
             valign=Gtk.Align.END)
-        self._setup_widgets()
+        self.setup_widgets()
+        self.set_transition_type(Gtk.RevealerTransitionType.CROSSFADE)
         self.show_all()
 
-    def _setup_widgets(self):
-        self.first_button = Gtk.Button.new_from_icon_name('go-first-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
-        self.prev_button = Gtk.Button.new_from_icon_name('go-previous-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
-        self.label = Gtk.Label.new_with_mnemonic('0/0')
-        self.next_button = Gtk.Button.new_from_icon_name('go-next-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
-        self.last_button = Gtk.Button.new_from_icon_name('go-last-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
-        self._navbar_box = Gtk.Grid(column_spacing=12)
-        self._navbar_box.add(self.first_button)
-        self._navbar_box.add(self.prev_button)
-        self._navbar_box.add(self.label)
-        self._navbar_box.add(self.next_button)
-        self._navbar_box.add(self.last_button)
+    def setup_widgets(self):
+        self.css_provider = Gtk.CssProvider()
+        self.css_provider.load_from_data(self.css)
 
-        self._navbar_frame = Gtk.Frame()
-        self._navbar_frame.get_style_context().add_class('app-notification')
-        self._navbar_frame.add(self._navbar_box)
-        self.add(self._navbar_frame)
+        context = self.get_style_context()
+        screen = self.get_screen()
+        context.add_class('bible-navbar')
+        context.add_provider_for_screen(screen, self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+        self.first_button = Gtk.ToolButton()
+        self.first_button.set_icon_name('go-first-symbolic')
+
+        self.prev_button = Gtk.ToolButton()
+        self.prev_button.set_icon_name('go-previous-symbolic')
+
+        self.label = Gtk.Label.new_with_mnemonic('0/0')
+        self.toolbar_label = Gtk.ToolItem()
+        self.toolbar_label.add(self.label)
+
+        self.next_button = Gtk.ToolButton()
+        self.next_button.set_icon_name('go-next-symbolic')
+
+        self.last_button = Gtk.ToolButton()
+        self.last_button.set_icon_name('go-last-symbolic')
+
+        self.toolbar = Gtk.Toolbar()
+        self.toolbar.set_icon_size(Gtk.IconSize.SMALL_TOOLBAR)
+
+        self.toolbar.insert(self.first_button, -1)
+        self.toolbar.insert(self.prev_button, -1)
+        self.toolbar.insert(self.toolbar_label, -1)
+        self.toolbar.insert(self.next_button, -1)
+        self.toolbar.insert(self.last_button, -1)
+
+        self.add(self.toolbar)
 
     def show_navbar(self):
         if not self.props.child_revealed:
             self.set_reveal_child(True)
+
+    def hide_navbar(self):
+        if self.props.child_revealed:
+            self.set_reveal_child(False)
