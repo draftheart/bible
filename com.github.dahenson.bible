@@ -9,9 +9,17 @@ gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gio
 from bible.application import Application
-from bible.defs import VERSION
 
 import bible
+
+try:
+    from bible.defs import VERSION, GSETTINGS_SCHEMA_DIR, DATA_DIR, \
+                           PKG_DATA_DIR, LOCALE_DIR, LIBEXEC_DIR
+    _defs_present = True
+except ImportError:
+    VERSION = GSETTINGS_SCHEMA_DIR = DATA_DIR = PKG_DATA_DIR = PKG_DATA_DIR = \
+              LOCALE_DIR = LIBEXEC_DIR = ''
+    _defs_present = False
 
 if __name__ == '__main__':
     parser = optparse.OptionParser(version=VERSION)
@@ -23,7 +31,7 @@ if __name__ == '__main__':
 if options.prefix or not _defs_present:
     _prefix = options.prefix or '/usr'
     DATA_DIR = os.path.join(_prefix, 'share')
-    LOCALE_DIR = Os.path.join(_prefix, 'share', 'locale')
+    LOCALE_DIR = os.path.join(_prefix, 'share', 'locale')
     GSETTINGS_SCHEMA_DIR = os.path.join(_prefix, 'share', 'glib-2.0', 'schemas')
     _me = os.path.abspath(os.path.dirname(__file__))
     PKG_DATA_DIR = os.path.join(_me, 'data')
