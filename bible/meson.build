@@ -15,6 +15,7 @@ configure_file(
 )
 
 shell_sources = [
+  '__init__.py',
   'application.py',
   'booklist.py',
   'library.py',

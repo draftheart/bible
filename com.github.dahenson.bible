@@ -5,12 +5,12 @@ import optparse
 import sys
 import signal
 import gi
+import bible
+
 gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gio
 from bible.application import Application
-
-import bible
 
 try:
     from bible.defs import VERSION, GSETTINGS_SCHEMA_DIR, DATA_DIR, \
