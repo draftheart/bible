@@ -19,11 +19,13 @@ class PassageView(Gtk.Grid):
                 font-size: 100%;
             }
             .main {
-                max-width: 32rem;
+                min-width: 32rem;
+                max-width: 100rem;
                 word-wrap: break-word;
                 line-height: 1.5rem;
                 margin: 0 auto 4rem auto;
                 padding: 0 1rem 0 1rem;
+                columns: 3 28rem;
             }
             span.verse-num {
                 color: #999;
@@ -34,7 +36,10 @@ class PassageView(Gtk.Grid):
                 vertical-align: text-top;
             }
             h1 { font-size: 2rem }
-            h2 { font-size: 1.5rem }
+            h2 {
+                font-size: 1.5rem;
+                column-span: all;
+            }
             h3 {
                 font-size: 1.125rem;
                 font-weight: lighter;

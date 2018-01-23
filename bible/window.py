@@ -44,13 +44,14 @@ class Window(Gtk.ApplicationWindow):
         self.setup_widgets()
 
         self.update_navbar_label()
-        self.refreshbook_list()
+        self.refresh_book_list()
         self.refresh_view()
         self.show_all()
 
-    def refreshbook_list(self):
+    def refresh_book_list(self):
         self.book_list.set_selected(self.library.get_testament(),
-                                     self.library.get_book())
+                                     self.library.get_book(),
+                                     self.library.get_chapter())
 
     def refresh_view(self):
         self.header.set_title(self.library.get_book_name())
@@ -75,7 +76,6 @@ class Window(Gtk.ApplicationWindow):
         self.book_list = BookList()
         self.book_select = self.book_list.get_selection()
         self.book_list.connect('row-activated', self._on_book_selected)
-
         self.paned_view = Gtk.Paned(position=200)
 
         self.scrolled = Gtk.ScrolledWindow(None, None)
@@ -134,15 +134,16 @@ class Window(Gtk.ApplicationWindow):
     def _on_book_selected(self, tree_view, path, column):
         model, treeiter = self.book_select.get_selected()
         if (treeiter is not None):
-            if (model[treeiter][1] != 0):
+            if (model[treeiter][1] != 0) and (model[treeiter][2] != 0):
                 self.library.set_testament(model[treeiter][0])
                 self.library.set_book(model[treeiter][1])
+                self.library.set_chapter(model[treeiter][2])
                 self.refresh_view()
-            if (model[treeiter][1] == 0):
+            if (model[treeiter][1] == 0) or (model[treeiter][2] == 0):
                 if tree_view.row_expanded(path):
                     tree_view.collapse_row(path)
                 else:
-                    tree_view.expand_row(path, True)
+                    tree_view.expand_row(path, False)
         self.update_navbar_label()
 
     def _on_module_selected(self, selection):
@@ -153,21 +154,23 @@ class Window(Gtk.ApplicationWindow):
     def _on_navbar_first_clicked(self, button):
         self.library.set_chapter(1)
         self.update_navbar_label()
+        self.refresh_book_list()
         self.refresh_view()
 
     def _on_navbar_prev_clicked(self, button):
         self.library.decrement_chapter()
         self.update_navbar_label()
-        self.refreshbook_list()
+        self.refresh_book_list()
         self.refresh_view()
 
     def _on_navbar_next_clicked(self, button):
         self.library.increment_chapter()
         self.update_navbar_label()
-        self.refreshbook_list()
+        self.refresh_book_list()
         self.refresh_view()
 
     def _on_navbar_last_clicked(self, button):
         self.library.set_chapter(self.library.get_chapter_max())
         self.update_navbar_label()
+        self.refresh_book_list()
         self.refresh_view()
