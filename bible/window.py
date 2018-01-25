@@ -35,6 +35,9 @@ class Window(Gtk.ApplicationWindow):
         self.module_list.set_active(0)
         self.module_list.connect('changed', self._on_module_selected)
 
+        active_module = self.settings.get_value('module')
+        self.module_list.set_active(active_module)
+
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
         self.header.set_title('Bible')
@@ -149,6 +152,7 @@ class Window(Gtk.ApplicationWindow):
     def _on_module_selected(self, selection):
         active = self.module_list.get_active_id()
         self.library.set_module(active)
+        self.settings.set_value('module', GLib.Variant("i", active))
         self.refresh_view()
 
     def _on_navbar_first_clicked(self, button):
