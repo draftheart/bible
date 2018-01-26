@@ -5,8 +5,9 @@ import glob, os
 from distutils.core import setup
 
 install_data = [('share/applications', ['data/com.github.dahenson.bible.desktop']),
-                ('share/metainfo', ['data/com.github.dahenson.bible.appdata.xml']),
-                ('share/icons/hicolor/128x128/apps',['data/com.github.dahenson.bible.svg']),
+                #('share/metainfo', ['data/com.github.dahenson.bible.appdata.xml']),
+                #('share/icons/hicolor/128x128/apps',['data/com.github.dahenson.bible.svg']),
+                ('share/glib-2.0/schemas', ['data/com.github.dahenson.bible.gschema.xml']),
                 ('bin/bible',['bible/__init__.py']),
                 ('bin/bible',['bible/application.py']),
                 ('bin/bible',['bible/booklist.py']),
