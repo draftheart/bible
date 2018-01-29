@@ -44,9 +44,11 @@ class Window(Gtk.ApplicationWindow):
         self.setup_widgets()
 
         self.update_navbar_label()
-        self.refresh_book_list()
         self.restore_saved_module()
+        self.restore_saved_passage()
         self.show_all()
+        self.refresh_book_list()
+        self.refresh_view()
 
     def refresh_book_list(self):
         self.book_list.set_selected(self.library.get_testament(),
@@ -78,6 +80,16 @@ class Window(Gtk.ApplicationWindow):
             self.module_list.set_active_id(active_module)
         else:
             self.module_list.set_active(0)
+
+    def restore_saved_passage(self):
+        location = self.settings.get_value("passage")
+        if(len(location) == 3 and
+            isinstance(location[0], int) and
+            isinstance(location[1], int) and
+            isinstance(location[2], int)):
+            self.library.set_testament(location[0])
+            self.library.set_book(location[1])
+            self.library.set_chapter(location[2])
 
     def setup_widgets(self):
         self.book_list = BookList()
@@ -151,12 +163,17 @@ class Window(Gtk.ApplicationWindow):
                     tree_view.collapse_row(path)
                 else:
                     tree_view.expand_row(path, False)
+            self.settings.set_value("passage",
+                                    GLib.Variant("ai",
+                                        [model[treeiter][0],
+                                        model[treeiter][1],
+                                        model[treeiter][2]]))
         self.update_navbar_label()
 
     def _on_module_selected(self, selection):
         active = self.module_list.get_active_id()
         self.library.set_module(active)
-        self.settings.set_value('module', GLib.Variant("s", active))
+        self.settings.set_value("module", GLib.Variant("s", active))
         self.refresh_view()
 
     def _on_navbar_first_clicked(self, button):
