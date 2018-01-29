@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Bible
+Comment=Read the Bible
+GenericName=Bible
+Exec=com.github.dahenson.bible
+Icon=com.github.dahenson.bible
+Terminal=false
+X-GNOME-Gettext-Domain=com.github.dahenson.bible
+X-GNOME-UsesNotifications=false
+Categories=Education;
+Keywords=Bible;Holy;Religion;

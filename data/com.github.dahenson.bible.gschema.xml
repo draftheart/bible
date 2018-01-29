@@ -16,5 +16,15 @@
             <summary>Window maximized</summary>
             <description>Window maximized state.</description>
         </key>
+        <key type="s" name="module">
+            <default>""</default>
+            <summary>Selected Module</summary>
+            <description>The last selected bible module.</description>
+        </key>
+        <key type="ai" name="passage">
+            <default>[1,1,1]</default>
+            <summary>Selected Passage</summary>
+            <description>The last selected bible passage.</description>
+        </key>
     </schema>
 </schemalist>
