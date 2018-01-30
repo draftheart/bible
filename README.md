@@ -1,3 +1,7 @@
+# Bible
+
+![Screenshot](data/screenshot1.png?raw=true)
+
 ## Read The Bible
 
 Using the power of the [Sword Project](https://crosswire.org/sword/), you can easily read biblical texts in over 50 languages.
