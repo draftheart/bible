@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2018 Dane Henson <thegreatdane@gmail.com>-->
+<component type="desktop">
+  <id>com.github.dahenson.bible.desktop</id>
+  <metadata_license>CC0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <name>Bible</name>
+  <summary>Read the Bible</summary>
+  <developer_name>Dane Henson</developer_name>
+  <url type="homepage">http://brainofdane.com</url>
+  <url type="bugtracker">https://github.com/dahenson/bible/issues</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/dahenson/bible/master/data/screenshot1.png</image>
+    </screenshot>
+  </screenshots>
+  <description>
+    <p>
+      Bible is a simple Bible reader backed by the powerful Sword library from Crosswire. It allows you to browse and read many translations of the Bible quickly, easily, and comfortably.
+    </p>
+    <ul>
+      <li></li>
+    </ul>
+  </description>
+
+  <releases>
+    <release version="1.0.0" date="2018-01-30">
+      <description>
+        <p>The first release!!!</p>
+        <ul>
+          <li>Simple bible reader with a comfortable adaptive layout and readable text</li>
+          <li>The ability to select different translations</li>
+          <li>Saves location and settings on exit</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>

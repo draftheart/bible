@@ -24,25 +24,32 @@
 import glob, os 
 from distutils.core import setup
 
-install_data = [('share/applications', ['data/com.github.dahenson.bible.desktop']),
-                #('share/metainfo', ['data/com.github.dahenson.bible.appdata.xml']),
-                #('share/icons/hicolor/128x128/apps',['data/com.github.dahenson.bible.svg']),
-                ('share/glib-2.0/schemas', ['data/com.github.dahenson.bible.gschema.xml']),
-                ('bin/bible',['bible/__init__.py']),
-                ('bin/bible',['bible/application.py']),
-                ('bin/bible',['bible/booklist.py']),
-                ('bin/bible',['bible/library.py']),
-                ('bin/bible',['bible/modulelist.py']),
-                ('bin/bible',['bible/navbar.py']),
-                ('bin/bible',['bible/passageview.py']),
-                ('bin/bible',['bible/window.py'])]
+inst_path = '/usr/share/com.github.dahenson.bible/bible'
 
-setup(  name='Bible',
-        version='0.0.1',
-        author='Dane Henson',
-        description='The Bible Reader for elementary OS',
-        url='https://github.com/dahenson/bible',
-        license='GNU GPL3',
-        scripts=['com.github.dahenson.bible'],
-        packages=['bible'],
-data_files=install_data)
+install_data = [('/usr/share/applications', ['data/com.github.dahenson.bible.desktop']),
+                ('share/metainfo', ['data/com.github.dahenson.bible.appdata.xml']),
+                #('/usr/share/icons/hicolor/128x128/apps',['data/com.github.dahenson.bible.svg']),
+                ('/usr/share/glib-2.0/schemas', ['data/com.github.dahenson.bible.gschema.xml']),
+                ('/usr/local/lib/python2.7/dist-packages', ['dist-packages/Sword.py']),
+                ('/usr/local/lib/python2.7/dist-packages', ['dist-packages/_Sword.so']),
+                (inst_path,['bible/__init__.py']),
+                (inst_path,['bible/application.py']),
+                (inst_path,['bible/booklist.py']),
+                (inst_path,['bible/library.py']),
+                (inst_path,['bible/modulelist.py']),
+                (inst_path,['bible/navbar.py']),
+                (inst_path,['bible/passageview.py']),
+                (inst_path,['bible/window.py'])]
+
+setup(name='Bible',
+      version='1.0.0',
+      author='Dane Henson',
+      description='The Bible Reader for elementary OS',
+      url='https://github.com/dahenson/bible',
+      license='GNU GPL3',
+      scripts=['com.github.dahenson.bible'],
+      packages=['bible'],
+      data_files=install_data)
+
+print('Compiling gsettings schemas...')
+os.system('glib-compile-schemas /usr/share/glib-2.0/schemas')
