@@ -27,7 +27,7 @@ from distutils.core import setup
 inst_path = '/usr/share/com.github.dahenson.bible/bible'
 
 install_data = [('/usr/share/applications', ['data/com.github.dahenson.bible.desktop']),
-                ('share/metainfo', ['data/com.github.dahenson.bible.appdata.xml']),
+                ('/usr/share/metainfo', ['data/com.github.dahenson.bible.appdata.xml']),
                 #('/usr/share/icons/hicolor/128x128/apps',['data/com.github.dahenson.bible.svg']),
                 ('/usr/share/glib-2.0/schemas', ['data/com.github.dahenson.bible.gschema.xml']),
                 ('/usr/local/lib/python2.7/dist-packages', ['dist-packages/Sword.py']),

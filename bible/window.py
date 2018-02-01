@@ -95,6 +95,11 @@ class Window(Gtk.ApplicationWindow):
         if self.settings.get_value('window-maximized'):
             self.maximize()
 
+    def restore_saved_pane_position(self):
+        position = self.settings.get_value('pane-position')
+        if (isinstance(position, int)):
+            self.paned_view.set_position(position)
+
     def restore_saved_module(self):
         active_module = self.settings.get_string('module')
         if (isinstance(active_module, str)):
@@ -103,7 +108,7 @@ class Window(Gtk.ApplicationWindow):
             self.module_list.set_active(0)
 
     def restore_saved_passage(self):
-        location = self.settings.get_value("passage")
+        location = self.settings.get_value('passage')
         if(len(location) == 3 and
             isinstance(location[0], int) and
             isinstance(location[1], int) and
@@ -116,10 +121,14 @@ class Window(Gtk.ApplicationWindow):
         self.book_list = BookList()
         self.book_select = self.book_list.get_selection()
         self.book_list.connect('row-activated', self._on_book_selected)
-        self.paned_view = Gtk.Paned(position=200)
+
+        self.paned_view = Gtk.Paned(position=150)
+        self.paned_view.set_size_request(700, 400)
+        self.restore_saved_pane_position()
 
         self.scrolled = Gtk.ScrolledWindow(None, None)
         self.scrolled.add(self.book_list)
+        self.scrolled.set_size_request(100, -1)
 
         self.passage_view = PassageView()
 
@@ -138,9 +147,14 @@ class Window(Gtk.ApplicationWindow):
         self.overlay.add_overlay(self.navbar)
         self.navbar.show_navbar()
         self.overlay.set_overlay_pass_through(self.navbar, True)
+        self.overlay.set_size_request(600, -1)
 
-        self.paned_view.add1(self.scrolled)
-        self.paned_view.add2(self.overlay)
+        self.paned_view.pack1(self.scrolled, True, False)
+        self.paned_view.pack2(self.overlay, True, False)
+        self.settings.bind('pane-position',
+            self.paned_view,
+            'position',
+            Gio.SettingsBindFlags.DEFAULT)
 
         self.add(self.paned_view)
 
@@ -184,8 +198,8 @@ class Window(Gtk.ApplicationWindow):
                     tree_view.collapse_row(path)
                 else:
                     tree_view.expand_row(path, False)
-            self.settings.set_value("passage",
-                                    GLib.Variant("ai",
+            self.settings.set_value('passage',
+                                    GLib.Variant('ai',
                                         [model[treeiter][0],
                                         model[treeiter][1],
                                         model[treeiter][2]]))
@@ -194,7 +208,7 @@ class Window(Gtk.ApplicationWindow):
     def _on_module_selected(self, selection):
         active = self.module_list.get_active_id()
         self.library.set_module(active)
-        self.settings.set_value("module", GLib.Variant("s", active))
+        self.settings.set_value('module', GLib.Variant('s', active))
         self.refresh_view()
 
     def _on_navbar_first_clicked(self, button):
