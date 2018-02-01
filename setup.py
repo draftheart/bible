@@ -21,12 +21,13 @@
   Authored by: Dane Henson <thegreatdane@gmail.com>
 """
 
-import glob, os 
+import glob, os
 from distutils.core import setup
+from distutils.command.install_data import install_data
 
 inst_path = '/usr/share/com.github.dahenson.bible/bible'
 
-install_data = [('/usr/share/applications', ['data/com.github.dahenson.bible.desktop']),
+inst_data = [('/usr/share/applications', ['data/com.github.dahenson.bible.desktop']),
                 ('/usr/share/metainfo', ['data/com.github.dahenson.bible.appdata.xml']),
                 #('/usr/share/icons/hicolor/128x128/apps',['data/com.github.dahenson.bible.svg']),
                 ('/usr/share/glib-2.0/schemas', ['data/com.github.dahenson.bible.gschema.xml']),
@@ -41,6 +42,12 @@ install_data = [('/usr/share/applications', ['data/com.github.dahenson.bible.des
                 (inst_path,['bible/passageview.py']),
                 (inst_path,['bible/window.py'])]
 
+class post_install(install_data):
+    def run(self):
+        install_data.run(self)
+        print('Compiling gsettings schemas...')
+        os.system('glib-compile-schemas /usr/share/glib-2.0/schemas')
+
 setup(name='Bible',
       version='1.0.0',
       author='Dane Henson',
@@ -49,7 +56,5 @@ setup(name='Bible',
       license='GNU GPL3',
       scripts=['com.github.dahenson.bible'],
       packages=['bible'],
-      data_files=install_data)
-
-print('Compiling gsettings schemas...')
-os.system('glib-compile-schemas /usr/share/glib-2.0/schemas')
+      data_files=inst_data,
+      cmdclass={'install_data': post_install})
