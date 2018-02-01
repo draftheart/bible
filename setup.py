@@ -27,9 +27,9 @@ from distutils.core import setup
 inst_path = '/usr/share/com.github.dahenson.bible/bible'
 
 install_data = [('/usr/share/applications', ['data/com.github.dahenson.bible.desktop']),
-                ('share/metainfo', ['data/com.github.dahenson.bible.appdata.xml']),
+                ('/usr/share/metainfo', ['data/com.github.dahenson.bible.appdata.xml']),
                 #('/usr/share/icons/hicolor/128x128/apps',['data/com.github.dahenson.bible.svg']),
-                ('/usr/share/glib-2.0/schemas', ['data/com.github.dahenson.bible.gschema.xml']),
+                ('/usr/local/share/glib-2.0/schemas', ['data/com.github.dahenson.bible.gschema.xml']),
                 ('/usr/local/lib/python2.7/dist-packages', ['dist-packages/Sword.py']),
                 ('/usr/local/lib/python2.7/dist-packages', ['dist-packages/_Sword.so']),
                 (inst_path,['bible/__init__.py']),
@@ -52,4 +52,4 @@ setup(name='Bible',
       data_files=install_data)
 
 print('Compiling gsettings schemas...')
-os.system('glib-compile-schemas /usr/share/glib-2.0/schemas')
+os.system('glib-compile-schemas /usr/local/share/glib-2.0/schemas')

@@ -26,5 +26,10 @@
             <summary>Selected Passage</summary>
             <description>The last selected bible passage.</description>
         </key>
+        <key type="i" name="pane-position">
+            <default>150</default>
+            <summary>Pane position</summary>
+            <description>Position of the side pane</description>
+        </key>
     </schema>
 </schemalist>
