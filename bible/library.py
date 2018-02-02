@@ -28,7 +28,8 @@ gi.require_version('Gtk', '3.0')
 class Library(GObject.GObject):
 
     __gsignals__ = {
-        'reference_changed': (GObject.SIGNAL_RUN_FIRST, None, ())
+        'reference_changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'module_changed': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
     def __init__(self):
@@ -101,6 +102,14 @@ class Library(GObject.GObject):
     def set_module(self, module):
         self._module = self._lib.getModule(module)
         self._module.renderText()
+        self.emit('module_changed')
+
+    def set_reference(self, testament, book, chapter, verse):
+        self._vk.setTestament(testament)
+        self._vk.setBook(book)
+        self._vk.setChapter(chapter)
+        self._vk.setVerse(verse)
+        self.emit('reference_changed')
 
     def set_testament(self, testament):
         self._vk.setTestament(testament)

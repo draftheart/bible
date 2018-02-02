@@ -92,6 +92,7 @@ class PassageView(Gtk.Grid):
 
         self.add(self.webview)
         library.connect('reference-changed', self._on_library_changed)
+        library.connect('module-changed', self._on_library_changed)
         self.show_all()
 
     def load_html(self, html):

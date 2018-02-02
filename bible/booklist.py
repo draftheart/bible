@@ -105,14 +105,15 @@ class BookList(Gtk.TreeView):
         model, treeiter = self.get_selection().get_selected()
         if (treeiter is not None):
             if (model[treeiter][1] != 0) and (model[treeiter][2] != 0):
-                self.library.set_testament(model[treeiter][0])
-                self.library.set_book(model[treeiter][1])
-                self.library.set_chapter(model[treeiter][2])
+                self.library.set_reference(model[treeiter][0],
+                                           model[treeiter][1],
+                                           model[treeiter][2],
+                                           1)
             if (model[treeiter][1] == 0) or (model[treeiter][2] == 0):
-                if tree_view.row_expanded(path):
-                    tree_view.collapse_row(path)
+                if self.row_expanded(path):
+                    self.collapse_row(path)
                 else:
-                    tree_view.expand_row(path, False)
+                    self.expand_row(path, False)
 
     def _on_reference_changed(self, library):
         self.set_selected(library.get_testament(),

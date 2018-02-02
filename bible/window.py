@@ -48,17 +48,13 @@ class Window(Gtk.ApplicationWindow):
         self.connect('configure-event', self._on_configure_event)
 
         self.library = Library()
+        self.library.connect('reference-changed', self._on_reference_changed)
 
         self.setup_widgets()
 
-        self.update_navbar_label()
+        self.show_all()
         self.restore_saved_module()
         self.restore_saved_passage()
-        self.show_all()
-        self.refresh_view()
-
-    def refresh_view(self):
-        self.header.set_title(self.library.get_book_name())
 
     def restore_saved_size(self):
         size_setting = self.settings.get_value('window-size')
@@ -172,38 +168,30 @@ class Window(Gtk.ApplicationWindow):
                 'GDK_WINDOW_STATE_MAXIMIZED' in
                 event.new_window_state.value_names)
 
-    def _on_book_selected(self, tree_view, path, column):
-        model, treeiter = self.book_select.get_selected()
-        if (treeiter is not None):
-            self.settings.set_value('passage',
-                                    GLib.Variant('ai',
-                                        [model[treeiter][0],
-                                        model[treeiter][1],
-                                        model[treeiter][2]]))
-        self.update_navbar_label()
+    def _on_reference_changed(self, library):
+        self.header.set_title(library.get_book_name())
+        self.settings.set_value('passage',
+                                GLib.Variant('ai',[library.get_testament(),
+                                                   library.get_book(),
+                                                   library.get_chapter()]))
 
     def _on_module_selected(self, selection):
         active = self.module_list.get_active_id()
         self.library.set_module(active)
         self.settings.set_value('module', GLib.Variant('s', active))
-        self.refresh_view()
 
     def _on_navbar_first_clicked(self, button):
         self.library.set_chapter(1)
         self.update_navbar_label()
-        self.refresh_view()
 
     def _on_navbar_prev_clicked(self, button):
         self.library.decrement_chapter()
         self.update_navbar_label()
-        self.refresh_view()
 
     def _on_navbar_next_clicked(self, button):
         self.library.increment_chapter()
         self.update_navbar_label()
-        self.refresh_view()
 
     def _on_navbar_last_clicked(self, button):
         self.library.set_chapter(self.library.get_chapter_max())
         self.update_navbar_label()
-        self.refresh_view()
