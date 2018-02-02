@@ -59,7 +59,6 @@ class Window(Gtk.ApplicationWindow):
 
     def refresh_view(self):
         self.header.set_title(self.library.get_book_name())
-        self.passage_view.load_html(self.library.render_chapter())
 
     def restore_saved_size(self):
         size_setting = self.settings.get_value('window-size')
@@ -109,8 +108,6 @@ class Window(Gtk.ApplicationWindow):
         self.set_titlebar(self.header)
 
         self.book_list = BookList(self.library)
-        self.book_select = self.book_list.get_selection()
-        self.book_list.connect('row-activated', self._on_book_selected)
 
         self.paned_view = Gtk.Paned(position=150)
         self.paned_view.set_size_request(700, 400)
@@ -120,7 +117,7 @@ class Window(Gtk.ApplicationWindow):
         self.scrolled.add(self.book_list)
         self.scrolled.set_size_request(100, -1)
 
-        self.passage_view = PassageView()
+        self.passage_view = PassageView(self.library)
 
         self.navbar = NavBar()
         self.navbar.first_button.connect('clicked',
@@ -178,16 +175,6 @@ class Window(Gtk.ApplicationWindow):
     def _on_book_selected(self, tree_view, path, column):
         model, treeiter = self.book_select.get_selected()
         if (treeiter is not None):
-            if (model[treeiter][1] != 0) and (model[treeiter][2] != 0):
-                self.library.set_testament(model[treeiter][0])
-                self.library.set_book(model[treeiter][1])
-                self.library.set_chapter(model[treeiter][2])
-                self.refresh_view()
-            if (model[treeiter][1] == 0) or (model[treeiter][2] == 0):
-                if tree_view.row_expanded(path):
-                    tree_view.collapse_row(path)
-                else:
-                    tree_view.expand_row(path, False)
             self.settings.set_value('passage',
                                     GLib.Variant('ai',
                                         [model[treeiter][0],

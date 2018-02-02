@@ -39,7 +39,7 @@ class BookList(Gtk.TreeView):
 
         self.library = library
 
-        self.get_style_context().add_class("source-list")
+        self.get_style_context().add_class('source-list')
 
         self._book_store = Gtk.TreeStore(int, int, int, str, str, str)
 
@@ -60,13 +60,14 @@ class BookList(Gtk.TreeView):
         self.set_model (self._book_store)
         self._populate_list()
         self.library.connect('reference-changed', self._on_reference_changed)
+
         self.show_all()
 
     def _book_cell_data_func(self, layout, renderer, model, iter, data):
         renderer.props.text = model[iter][5]
         renderer.props.xpad = 6
 
-        if (model[iter][3] == "testament"):
+        if (model[iter][3] == 'testament'):
             renderer.props.weight = Pango.Weight.BOLD
         else:
             renderer.props.weight = Pango.Weight.NORMAL
@@ -74,10 +75,10 @@ class BookList(Gtk.TreeView):
     def _icon_cell_data_func(self, layout, renderer, model, iter, data):
         renderer.props.visible = True
 
-        if (model[iter][3] == "book"):
-            renderer.props.icon_name = "library-audiobook"
-        elif model[iter][3] == "chapter":
-            renderer.props.icon_name = "document"
+        if (model[iter][3] == 'book'):
+            renderer.props.icon_name = 'library-audiobook'
+        elif model[iter][3] == 'chapter':
+            renderer.props.icon_name = 'document'
         else:
             renderer.props.icon_name = None
             renderer.props.visible = False
@@ -85,20 +86,33 @@ class BookList(Gtk.TreeView):
     def _populate_list(self):
         vk = VerseKey()
 
-        testament_iter = self._book_store.append(None, [1, 0, 0, "testament", "", "Old Testament"])
+        testament_iter = self._book_store.append(None, [1, 0, 0, 'testament', '', 'Old Testament'])
         for b in range(1, vk.bookCount(1) + 1):
             vk.setBook(b)
-            book_iter = self._book_store.append(testament_iter, [1, b, 0, "book", "library-audiobook", vk.getBookName()])
+            book_iter = self._book_store.append(testament_iter, [1, b, 0, 'book', 'library-audiobook', vk.getBookName()])
             for c in range(1, vk.getChapterMax() + 1):
-                self._book_store.append(book_iter, [1, b, c, "chapter", "document", "Chapter {}".format(c)])
+                self._book_store.append(book_iter, [1, b, c, 'chapter', 'document', 'Chapter {}'.format(c)])
 
         vk.setTestament(2)
-        testament_iter = self._book_store.append(None, [2, 0, 0, "testament", "", "New Testament"])
+        testament_iter = self._book_store.append(None, [2, 0, 0, 'testament', '', 'New Testament'])
         for b in range(1, vk.bookCount(2) + 1):
             vk.setBook(b)
-            book_iter = self._book_store.append(testament_iter, [2, b, 0, "book", "library-audiobook", vk.getBookName()])
+            book_iter = self._book_store.append(testament_iter, [2, b, 0, 'book', 'library-audiobook', vk.getBookName()])
             for c in range(1, vk.getChapterMax() + 1):
-                self._book_store.append(book_iter, [2, b, c, "chapter", "document", "Chapter {}".format(c)])
+                self._book_store.append(book_iter, [2, b, c, 'chapter', 'document', 'Chapter {}'.format(c)])
+
+    def do_row_activated(self, path, column):
+        model, treeiter = self.get_selection().get_selected()
+        if (treeiter is not None):
+            if (model[treeiter][1] != 0) and (model[treeiter][2] != 0):
+                self.library.set_testament(model[treeiter][0])
+                self.library.set_book(model[treeiter][1])
+                self.library.set_chapter(model[treeiter][2])
+            if (model[treeiter][1] == 0) or (model[treeiter][2] == 0):
+                if tree_view.row_expanded(path):
+                    tree_view.collapse_row(path)
+                else:
+                    tree_view.expand_row(path, False)
 
     def _on_reference_changed(self, library):
         self.set_selected(library.get_testament(),

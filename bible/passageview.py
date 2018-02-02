@@ -28,9 +28,11 @@ from gettext import gettext as _
 
 class PassageView(Gtk.Grid):
 
-    def __init__(self):
-        Gtk.Grid.__init__(self)
-        self.props.expand = True
+    def __init__(self, library):
+        Gtk.Grid.__init__(self,
+                          expand=True)
+
+        library
 
         stylesheet = """
             :root {
@@ -89,10 +91,14 @@ class PassageView(Gtk.Grid):
         self.webview.connect('context-menu', self._on_context_menu)
 
         self.add(self.webview)
+        library.connect('reference-changed', self._on_library_changed)
         self.show_all()
 
     def load_html(self, html):
         self.webview.load_html(html)
+
+    def _on_library_changed(self, library):
+        self.webview.load_html(library.render_chapter())
 
     def _on_context_menu(self, web_view, context_menu, event, hit_test_result):
         items = context_menu.get_items()
