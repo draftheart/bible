@@ -49,32 +49,13 @@ class Window(Gtk.ApplicationWindow):
 
         self.library = Library()
 
-        self.module_list = ModuleList()
-        for mod in self.library.bibles:
-            self.module_list.add_module(mod[0], mod[1], mod[2])
-
-        self.module_list.set_active(0)
-        self.module_list.connect('changed', self._on_module_selected)
-
-        self.header = Gtk.HeaderBar()
-        self.header.set_show_close_button(True)
-        self.header.set_title('Bible')
-        self.header.pack_start(self.module_list)
-        self.set_titlebar(self.header)
-
         self.setup_widgets()
 
         self.update_navbar_label()
         self.restore_saved_module()
         self.restore_saved_passage()
         self.show_all()
-        self.refresh_book_list()
         self.refresh_view()
-
-    def refresh_book_list(self):
-        self.book_list.set_selected(self.library.get_testament(),
-                                     self.library.get_book(),
-                                     self.library.get_chapter())
 
     def refresh_view(self):
         self.header.set_title(self.library.get_book_name())
@@ -118,7 +99,16 @@ class Window(Gtk.ApplicationWindow):
             self.library.set_chapter(location[2])
 
     def setup_widgets(self):
-        self.book_list = BookList()
+        self.module_list = ModuleList(self.library)
+        self.module_list.connect('changed', self._on_module_selected)
+
+        self.header = Gtk.HeaderBar()
+        self.header.set_show_close_button(True)
+        self.header.set_title('Bible')
+        self.header.pack_start(self.module_list)
+        self.set_titlebar(self.header)
+
+        self.book_list = BookList(self.library)
         self.book_select = self.book_list.get_selection()
         self.book_list.connect('row-activated', self._on_book_selected)
 
@@ -214,23 +204,19 @@ class Window(Gtk.ApplicationWindow):
     def _on_navbar_first_clicked(self, button):
         self.library.set_chapter(1)
         self.update_navbar_label()
-        self.refresh_book_list()
         self.refresh_view()
 
     def _on_navbar_prev_clicked(self, button):
         self.library.decrement_chapter()
         self.update_navbar_label()
-        self.refresh_book_list()
         self.refresh_view()
 
     def _on_navbar_next_clicked(self, button):
         self.library.increment_chapter()
         self.update_navbar_label()
-        self.refresh_book_list()
         self.refresh_view()
 
     def _on_navbar_last_clicked(self, button):
         self.library.set_chapter(self.library.get_chapter_max())
         self.update_navbar_label()
-        self.refresh_book_list()
         self.refresh_view()

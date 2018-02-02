@@ -27,7 +27,7 @@ from gi.repository import Gtk, Pango
 
 class BookList(Gtk.TreeView):
 
-    def __init__(self):
+    def __init__(self, library):
         Gtk.TreeView.__init__(self,
                               reorderable=False,
                               headers_visible=False,
@@ -36,6 +36,8 @@ class BookList(Gtk.TreeView):
                               activate_on_single_click=True,
                               halign=Gtk.Align.FILL,
                               valign=Gtk.Align.FILL)
+
+        self.library = library
 
         self.get_style_context().add_class("source-list")
 
@@ -56,9 +58,8 @@ class BookList(Gtk.TreeView):
         item_column.set_cell_data_func(icon_cell, self._icon_cell_data_func)
 
         self.set_model (self._book_store)
-
         self._populate_list()
-
+        self.library.connect('reference-changed', self._on_reference_changed)
         self.show_all()
 
     def _book_cell_data_func(self, layout, renderer, model, iter, data):
@@ -98,6 +99,11 @@ class BookList(Gtk.TreeView):
             book_iter = self._book_store.append(testament_iter, [2, b, 0, "book", "library-audiobook", vk.getBookName()])
             for c in range(1, vk.getChapterMax() + 1):
                 self._book_store.append(book_iter, [2, b, c, "chapter", "document", "Chapter {}".format(c)])
+
+    def _on_reference_changed(self, library):
+        self.set_selected(library.get_testament(),
+                          library.get_book(),
+                          library.get_chapter())
 
     def set_selected(self, testament, book, chapter):
         path_string = '{}:{}:{}'.format(testament-1, book-1, chapter-1)

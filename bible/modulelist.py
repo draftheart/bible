@@ -28,9 +28,18 @@ from gettext import gettext as _
 
 class ModuleList(Gtk.ComboBox):
 
-    def __init__(self):
+    def __init__(self, library):
         Gtk.ComboBox.__init__(self)
+        self.library = library
 
+        self.create_model()
+        self.populate_list()
+        self.show_all()
+
+    def add_module(self, index, name, description):
+        self._list_store.append([index, name, description])
+
+    def create_model(self):
         id_text = Gtk.CellRendererText()
         self.pack_start(id_text, True)
         self.add_attribute(id_text, 'text', 1)
@@ -43,11 +52,13 @@ class ModuleList(Gtk.ComboBox):
         self._list_store = Gtk.ListStore(int, str, str)
         self.set_model(self._list_store)
 
-        self.set_tooltip_text("Select Translation")
+        self.set_tooltip_text('Select Text')
 
         self.set_id_column(1)
 
-        self.show_all()
-
-    def add_module(self, index, name, description):
-        self._list_store.append([index, name, description])
+    def populate_list(self):
+        if (len(self.library.bibles) > 0):
+            for mod in self.library.bibles:
+                self.add_module(mod[0], mod[1], mod[2])
+        else:
+            self.add_module(999, 'No Texts Loaded', '')
