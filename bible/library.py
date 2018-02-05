@@ -91,6 +91,9 @@ class Library(GObject.GObject):
     def get_testament(self):
         return ord(self._vk.getTestament())
 
+    def has_module(self, module):
+        return None != self._lib.getModule(module)
+
     def set_book(self, book):
         self._vk.setBook(book)
         self.emit('reference_changed')
@@ -101,7 +104,8 @@ class Library(GObject.GObject):
 
     def set_module(self, module):
         self._module = self._lib.getModule(module)
-        self._module.renderText()
+        if (self._module != None):
+            self._module.renderText()
         self.emit('module_changed')
 
     def set_reference(self, testament, book, chapter, verse):
@@ -130,30 +134,34 @@ class Library(GObject.GObject):
     def render_chapter(self):
         buf = '<h2>{} {}</h2>'.format(self.get_book_name(), self.get_chapter())
 
-        for v in range(1, self._vk.getVerseMax()):
-            self._vk.setVerse(v)
-            self._module.setKey(self._vk)
-            verse_text = self._module.renderText().c_str()
+        if self._module != None:
+            for v in range(1, self._vk.getVerseMax()):
+                self._vk.setVerse(v)
+                self._module.setKey(self._vk)
+                verse_text = self._module.renderText().c_str()
 
-            heading = self.get_entry_attribute('Heading', 'Preverse', '0')
-            heading = self._module.renderText(heading).c_str()
+                heading = self.get_entry_attribute('Heading', 'Preverse', '0')
+                heading = self._module.renderText(heading).c_str()
 
-            text = '{}<span class="verse-num">{}</span> {} '\
-                .format(heading, v, verse_text)
-            buf = buf + text
+                text = '{}<span class="verse-num">{}</span> {} '\
+                    .format(heading, v, verse_text)
+                buf = buf + text
+            return self._html_skele.format(buf)
 
-        return self._html_skele.format(buf)
+        return ""
 
     def strip_chapter(self):
         buf = ''
-        for v in range(1, self._vk.getVerseMax()):
-            self._vk.setVerse(v)
-            self._module.setKey(self._vk)
-            text = "{} {} {}".format(self._vk.getVerse(),
-                                     self._module.stripText(),
-                                     "<br />"
-            )
-            buf = buf + text
+
+        if self._module != None:
+            for v in range(1, self._vk.getVerseMax()):
+                self._vk.setVerse(v)
+                self._module.setKey(self._vk)
+                text = "{} {} {}".format(self._vk.getVerse(),
+                                         self._module.stripText(),
+                                         "<br />"
+                )
+                buf = buf + text
 
         return buf
 

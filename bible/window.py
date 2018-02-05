@@ -79,7 +79,8 @@ class Window(Gtk.ApplicationWindow):
 
     def restore_saved_module(self):
         active_module = self.settings.get_string('module')
-        if (isinstance(active_module, str)):
+        if (isinstance(active_module, str)
+            & self.library.has_module(active_module)):
             self.module_list.set_active_id(active_module)
         else:
             self.module_list.set_active(0)
@@ -185,10 +186,10 @@ class Window(Gtk.ApplicationWindow):
 
     def _on_module_selected(self, selection):
         active = self.module_list.get_active_id()
-        if ((active == 999) &
+        if ((self.module_list.empty) &
             (self.stack.get_visible_child_name() == 'passage-view')):
             self.stack.set_visible_child_name('welcome')
-        elif ((active != 999) &
+        elif ((self.module_list.empty == False) &
             (self.stack.get_visible_child_name() == 'welcome')):
             self.stack.set_visible_child_name('passage-view')
         self.library.set_module(active)
