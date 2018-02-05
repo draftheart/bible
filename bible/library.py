@@ -19,11 +19,21 @@
   Authored by: Dane Henson <thegreatdane@gmail.com>
 """
 
+from gi.repository import GObject
 from Sword import SWMgr, SWModule, SWBuf, VerseKey, OSISHTMLHREF, MarkupFilterMgr
 
-class Library():
+import gi
+gi.require_version('Gtk', '3.0')
+
+class Library(GObject.GObject):
+
+    __gsignals__ = {
+        'reference_changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'module_changed': (GObject.SIGNAL_RUN_FIRST, None, ())
+    }
 
     def __init__(self):
+        GObject.GObject.__init__(self)
         self._filter_manager = MarkupFilterMgr(10, 2)
         self._lib = SWMgr(self._filter_manager)
         self._lib.setGlobalOption('Headings', 'On')
@@ -43,86 +53,17 @@ class Library():
         </html>
         """
 
-    def _make_mod_lists(self):
-        self.bibles = []
-        self.commentaries = []
-
-        mods = self._lib.getModules()
-        i = 0
-
-        for mod in mods:
-
-            module = self._lib.getModule(mod.c_str())
-
-            if (module.getType() == self._lib.MODTYPE_BIBLES):
-                self.bibles.append([i, mod.c_str(), module.getDescription()])
-
-    def set_module(self, module):
-        self._module = self._lib.getModule(module)
-        self._module.renderText()
-
-    def set_testament(self, testament):
-        self._vk.setTestament(testament)
-
-    def get_testament(self):
-        return ord(self._vk.getTestament())
-
-    def set_book(self, book):
-        self._vk.setBook(book)
-
     def get_book(self):
         return ord(self._vk.getBook())
 
     def get_book_name(self):
         return self._vk.getBookName()
 
-    def set_chapter(self, chapter):
-        self._vk.setChapter(chapter)
-
     def get_chapter(self):
         return self._vk.getChapter()
 
     def get_chapter_max(self):
         return self._vk.getChapterMax()
-
-    def increment_chapter(self):
-        self._vk.setChapter(self._vk.getChapter()+1)
-
-    def decrement_chapter(self):
-        self._vk.setChapter(self._vk.getChapter()-1)
-
-    def set_verse(self, verse):
-        self._vk.setVerse(verse)
-
-    def render_chapter(self):
-        buf = '<h2>{} {}</h2>'.format(self.get_book_name(), self.get_chapter())
-
-        for v in range(1, self._vk.getVerseMax()):
-            self._vk.setVerse(v)
-            self._module.setKey(self._vk)
-            verse_text = self._module.renderText().c_str()
-
-            heading = self.get_entry_attribute('Heading', 'Preverse', '0')
-            heading = self._module.renderText(heading).c_str()
-
-            text = '{}<span class="verse-num">{}</span> {} '\
-                .format(heading, v, verse_text)
-            buf = buf + text
-
-        return self._html_skele.format(buf)
-
-    def strip_chapter(self):
-        buf = ''
-        for v in range(1, self._vk.getVerseMax()):
-            self._vk.setVerse(v)
-            self._module.setKey(self._vk)
-            text = "{} {} {}".format(self._vk.getVerse(),
-                                     self._module.stripText(),
-                                     "<br />"
-            )
-            buf = buf + text
-
-        return buf
 
     def get_entry_attribute(self, level1, level2, level3):
         l1 = SWBuf(level1)
@@ -146,3 +87,116 @@ class Library():
         m = self._module.getEntryAttributesMap()
 
         return m.has_key(l1)
+
+    def get_first_valid_passage(self):
+        vk = VerseKey()
+        if (self._module != None):
+            for t in range(1, 3):
+                vk.setTestament(t)
+                for b in range(1, vk.bookCount(t) + 1):
+                    vk.setBook(b)
+                    for c in range(1, vk.getChapterMax() + 1):
+                        vk.setChapter(c)
+                        if self._module.hasEntry(vk):
+                            return [t, b, c]
+        return [1, 1, 1]
+
+    def get_passage_valid(self):
+        if (self._module != None):
+            return self._module.hasEntry(self._vk)
+
+    def get_testament(self):
+        return ord(self._vk.getTestament())
+
+    def has_module(self, module):
+        return None != self._lib.getModule(module)
+
+    def has_passage(self, vk):
+        if (self._module != None):
+            return self._module.hasEntry(vk)
+        return False
+
+    def set_book(self, book):
+        self._vk.setBook(book)
+        self.emit('reference_changed')
+
+    def set_chapter(self, chapter):
+        self._vk.setChapter(chapter)
+        self.emit('reference_changed')
+
+    def set_module(self, module):
+        self._module = self._lib.getModule(module)
+        if (self._module != None):
+            self._module.renderText()
+        self.emit('module_changed')
+
+    def set_reference(self, testament, book, chapter, verse):
+        self._vk.setTestament(testament)
+        self._vk.setBook(book)
+        self._vk.setChapter(chapter)
+        self._vk.setVerse(verse)
+        self.emit('reference_changed')
+
+    def set_testament(self, testament):
+        self._vk.setTestament(testament)
+        self.emit('reference_changed')
+
+    def set_verse(self, verse):
+        self._vk.setVerse(verse)
+        self.emit('reference_changed')
+
+    def increment_chapter(self):
+        self._vk.setChapter(self._vk.getChapter()+1)
+        self.emit('reference_changed')
+
+    def decrement_chapter(self):
+        self._vk.setChapter(self._vk.getChapter()-1)
+        self.emit('reference_changed')
+
+    def render_chapter(self):
+        buf = '<h2>{} {}</h2>'.format(self.get_book_name(), self.get_chapter())
+
+        if self._module != None:
+            for v in range(1, self._vk.getVerseMax()):
+                self._vk.setVerse(v)
+                self._module.setKey(self._vk)
+                verse_text = self._module.renderText().c_str()
+
+                heading = self.get_entry_attribute('Heading', 'Preverse', '0')
+                heading = self._module.renderText(heading).c_str()
+
+                text = '{}<span class="verse-num">{}</span> {} '\
+                    .format(heading, v, verse_text)
+                buf = buf + text
+            return self._html_skele.format(buf)
+
+        return ""
+
+    def strip_chapter(self):
+        buf = ''
+
+        if self._module != None:
+            for v in range(1, self._vk.getVerseMax()):
+                self._vk.setVerse(v)
+                self._module.setKey(self._vk)
+                text = "{} {} {}".format(self._vk.getVerse(),
+                                         self._module.stripText(),
+                                         "<br />"
+                )
+                buf = buf + text
+
+        return buf
+
+    def _make_mod_lists(self):
+        self.bibles = []
+        self.commentaries = []
+
+        mods = self._lib.getModules()
+        i = 0
+
+        for mod in mods:
+
+            module = self._lib.getModule(mod.c_str())
+
+            if (module.getType() == self._lib.MODTYPE_BIBLES):
+                self.bibles.append([i, mod.c_str(), module.getDescription()])

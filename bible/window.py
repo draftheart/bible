@@ -25,6 +25,7 @@ from bible.booklist import BookList
 from bible.passageview import PassageView
 from bible.navbar import NavBar
 from bible.modulelist import ModuleList
+from bible.welcome import Welcome
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -48,37 +49,13 @@ class Window(Gtk.ApplicationWindow):
         self.connect('configure-event', self._on_configure_event)
 
         self.library = Library()
-
-        self.module_list = ModuleList()
-        for mod in self.library.bibles:
-            self.module_list.add_module(mod[0], mod[1], mod[2])
-
-        self.module_list.set_active(0)
-        self.module_list.connect('changed', self._on_module_selected)
-
-        self.header = Gtk.HeaderBar()
-        self.header.set_show_close_button(True)
-        self.header.set_title('Bible')
-        self.header.pack_start(self.module_list)
-        self.set_titlebar(self.header)
+        self.library.connect('reference-changed', self._on_reference_changed)
 
         self.setup_widgets()
 
-        self.update_navbar_label()
+        self.show_all()
         self.restore_saved_module()
         self.restore_saved_passage()
-        self.show_all()
-        self.refresh_book_list()
-        self.refresh_view()
-
-    def refresh_book_list(self):
-        self.book_list.set_selected(self.library.get_testament(),
-                                     self.library.get_book(),
-                                     self.library.get_chapter())
-
-    def refresh_view(self):
-        self.header.set_title(self.library.get_book_name())
-        self.passage_view.load_html(self.library.render_chapter())
 
     def restore_saved_size(self):
         size_setting = self.settings.get_value('window-size')
@@ -102,7 +79,8 @@ class Window(Gtk.ApplicationWindow):
 
     def restore_saved_module(self):
         active_module = self.settings.get_string('module')
-        if (isinstance(active_module, str)):
+        if (isinstance(active_module, str)
+            & self.library.has_module(active_module)):
             self.module_list.set_active_id(active_module)
         else:
             self.module_list.set_active(0)
@@ -118,9 +96,16 @@ class Window(Gtk.ApplicationWindow):
             self.library.set_chapter(location[2])
 
     def setup_widgets(self):
-        self.book_list = BookList()
-        self.book_select = self.book_list.get_selection()
-        self.book_list.connect('row-activated', self._on_book_selected)
+        self.module_list = ModuleList(self.library)
+        self.module_list.connect('changed', self._on_module_selected)
+
+        self.header = Gtk.HeaderBar()
+        self.header.set_show_close_button(True)
+        self.header.set_title('Bible')
+        self.header.pack_start(self.module_list)
+        self.set_titlebar(self.header)
+
+        self.book_list = BookList(self.library)
 
         self.paned_view = Gtk.Paned(position=150)
         self.paned_view.set_size_request(700, 400)
@@ -130,7 +115,7 @@ class Window(Gtk.ApplicationWindow):
         self.scrolled.add(self.book_list)
         self.scrolled.set_size_request(100, -1)
 
-        self.passage_view = PassageView()
+        self.passage_view = PassageView(self.library)
 
         self.navbar = NavBar()
         self.navbar.first_button.connect('clicked',
@@ -147,10 +132,16 @@ class Window(Gtk.ApplicationWindow):
         self.overlay.add_overlay(self.navbar)
         self.navbar.show_navbar()
         self.overlay.set_overlay_pass_through(self.navbar, True)
-        self.overlay.set_size_request(600, -1)
+
+        self.welcome = Welcome()
+
+        self.stack = Gtk.Stack()
+        self.stack.set_size_request(600, -1)
+        self.stack.add_named(self.overlay, 'passage-view')
+        self.stack.add_named(self.welcome, 'welcome')
 
         self.paned_view.pack1(self.scrolled, True, False)
-        self.paned_view.pack2(self.overlay, True, False)
+        self.paned_view.pack2(self.stack, True, False)
         self.settings.bind('pane-position',
             self.paned_view,
             'position',
@@ -185,52 +176,42 @@ class Window(Gtk.ApplicationWindow):
                 'GDK_WINDOW_STATE_MAXIMIZED' in
                 event.new_window_state.value_names)
 
-    def _on_book_selected(self, tree_view, path, column):
-        model, treeiter = self.book_select.get_selected()
-        if (treeiter is not None):
-            if (model[treeiter][1] != 0) and (model[treeiter][2] != 0):
-                self.library.set_testament(model[treeiter][0])
-                self.library.set_book(model[treeiter][1])
-                self.library.set_chapter(model[treeiter][2])
-                self.refresh_view()
-            if (model[treeiter][1] == 0) or (model[treeiter][2] == 0):
-                if tree_view.row_expanded(path):
-                    tree_view.collapse_row(path)
-                else:
-                    tree_view.expand_row(path, False)
-            self.settings.set_value('passage',
-                                    GLib.Variant('ai',
-                                        [model[treeiter][0],
-                                        model[treeiter][1],
-                                        model[treeiter][2]]))
+    def _on_reference_changed(self, library):
+        self.header.set_title(library.get_book_name())
         self.update_navbar_label()
+        self.settings.set_value('passage',
+                                GLib.Variant('ai',[library.get_testament(),
+                                                   library.get_book(),
+                                                   library.get_chapter()]))
 
     def _on_module_selected(self, selection):
         active = self.module_list.get_active_id()
+        if ((self.module_list.empty) &
+            (self.stack.get_visible_child_name() == 'passage-view')):
+            self.stack.set_visible_child_name('welcome')
+        elif ((self.module_list.empty == False) &
+            (self.stack.get_visible_child_name() == 'welcome')):
+            self.stack.set_visible_child_name('passage-view')
+
         self.library.set_module(active)
+
+        if self.library.get_passage_valid() != True:
+            p = self.library.get_first_valid_passage()
+            self.library.set_reference(p[0], p[1], p[2], 1)
         self.settings.set_value('module', GLib.Variant('s', active))
-        self.refresh_view()
 
     def _on_navbar_first_clicked(self, button):
         self.library.set_chapter(1)
         self.update_navbar_label()
-        self.refresh_book_list()
-        self.refresh_view()
 
     def _on_navbar_prev_clicked(self, button):
         self.library.decrement_chapter()
         self.update_navbar_label()
-        self.refresh_book_list()
-        self.refresh_view()
 
     def _on_navbar_next_clicked(self, button):
         self.library.increment_chapter()
         self.update_navbar_label()
-        self.refresh_book_list()
-        self.refresh_view()
 
     def _on_navbar_last_clicked(self, button):
         self.library.set_chapter(self.library.get_chapter_max())
         self.update_navbar_label()
-        self.refresh_book_list()
-        self.refresh_view()
