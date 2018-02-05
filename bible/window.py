@@ -170,6 +170,7 @@ class Window(Gtk.ApplicationWindow):
 
     def _on_reference_changed(self, library):
         self.header.set_title(library.get_book_name())
+        self.update_navbar_label()
         self.settings.set_value('passage',
                                 GLib.Variant('ai',[library.get_testament(),
                                                    library.get_book(),
