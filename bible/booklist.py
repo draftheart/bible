@@ -60,6 +60,7 @@ class BookList(Gtk.TreeView):
         self.set_model (self._book_store)
         self._populate_list()
         self.library.connect('reference-changed', self._on_reference_changed)
+        self.library.connect('module-changed', self._on_module_changed)
 
         self.show_all()
 
@@ -89,17 +90,19 @@ class BookList(Gtk.TreeView):
         testament_iter = self._book_store.append(None, [1, 0, 0, 'testament', '', 'Old Testament'])
         for b in range(1, vk.bookCount(1) + 1):
             vk.setBook(b)
-            book_iter = self._book_store.append(testament_iter, [1, b, 0, 'book', 'library-audiobook', vk.getBookName()])
-            for c in range(1, vk.getChapterMax() + 1):
-                self._book_store.append(book_iter, [1, b, c, 'chapter', 'document', 'Chapter {}'.format(c)])
+            if self.library.has_passage(vk):
+                book_iter = self._book_store.append(testament_iter, [1, b, 0, 'book', 'library-audiobook', vk.getBookName()])
+                for c in range(1, vk.getChapterMax() + 1):
+                    self._book_store.append(book_iter, [1, b, c, 'chapter', 'document', 'Chapter {}'.format(c)])
 
         vk.setTestament(2)
         testament_iter = self._book_store.append(None, [2, 0, 0, 'testament', '', 'New Testament'])
         for b in range(1, vk.bookCount(2) + 1):
             vk.setBook(b)
-            book_iter = self._book_store.append(testament_iter, [2, b, 0, 'book', 'library-audiobook', vk.getBookName()])
-            for c in range(1, vk.getChapterMax() + 1):
-                self._book_store.append(book_iter, [2, b, c, 'chapter', 'document', 'Chapter {}'.format(c)])
+            if self.library.has_passage(vk):
+                book_iter = self._book_store.append(testament_iter, [2, b, 0, 'book', 'library-audiobook', vk.getBookName()])
+                for c in range(1, vk.getChapterMax() + 1):
+                    self._book_store.append(book_iter, [2, b, c, 'chapter', 'document', 'Chapter {}'.format(c)])
 
     def do_row_activated(self, path, column):
         model, treeiter = self.get_selection().get_selected()
@@ -114,6 +117,10 @@ class BookList(Gtk.TreeView):
                     self.collapse_row(path)
                 else:
                     self.expand_row(path, False)
+
+    def _on_module_changed(self, library):
+        self.get_model().clear()
+        self._populate_list()
 
     def _on_reference_changed(self, library):
         self.set_selected(library.get_testament(),

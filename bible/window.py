@@ -192,7 +192,12 @@ class Window(Gtk.ApplicationWindow):
         elif ((self.module_list.empty == False) &
             (self.stack.get_visible_child_name() == 'welcome')):
             self.stack.set_visible_child_name('passage-view')
+
         self.library.set_module(active)
+
+        if self.library.get_passage_valid() != True:
+            p = self.library.get_first_valid_passage()
+            self.library.set_reference(p[0], p[1], p[2], 1)
         self.settings.set_value('module', GLib.Variant('s', active))
 
     def _on_navbar_first_clicked(self, button):

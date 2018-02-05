@@ -88,11 +88,33 @@ class Library(GObject.GObject):
 
         return m.has_key(l1)
 
+    def get_first_valid_passage(self):
+        vk = VerseKey()
+        if (self._module != None):
+            for t in range(1, 3):
+                vk.setTestament(t)
+                for b in range(1, vk.bookCount(t) + 1):
+                    vk.setBook(b)
+                    for c in range(1, vk.getChapterMax() + 1):
+                        vk.setChapter(c)
+                        if self._module.hasEntry(vk):
+                            return [t, b, c]
+        return [1, 1, 1]
+
+    def get_passage_valid(self):
+        if (self._module != None):
+            return self._module.hasEntry(self._vk)
+
     def get_testament(self):
         return ord(self._vk.getTestament())
 
     def has_module(self, module):
         return None != self._lib.getModule(module)
+
+    def has_passage(self, vk):
+        if (self._module != None):
+            return self._module.hasEntry(vk)
+        return False
 
     def set_book(self, book):
         self._vk.setBook(book)
