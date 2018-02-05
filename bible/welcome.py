@@ -32,7 +32,7 @@ class Welcome(Granite.WidgetsWelcome):
         self.append('document-import',
                     'Import Bibles',
                     'Import a local Bible into you library.')
-        self.append('folder-import',
+        self.append('applications-internet',
                     'Download Bibles',
                     'Download free Bibles from the online library')
 

@@ -139,8 +139,6 @@ class Window(Gtk.ApplicationWindow):
         self.stack.add_named(self.overlay, 'passage-view')
         self.stack.add_named(self.welcome, 'welcome')
 
-        self.stack.set_visible_child_name('welcome')
-
         self.paned_view.pack1(self.scrolled, True, False)
         self.paned_view.pack2(self.stack, True, False)
         self.settings.bind('pane-position',
@@ -187,6 +185,12 @@ class Window(Gtk.ApplicationWindow):
 
     def _on_module_selected(self, selection):
         active = self.module_list.get_active_id()
+        if ((active == 999) &
+            (self.stack.get_visible_child_name() == 'passage-view')):
+            self.stack.set_visible_child_name('welcome')
+        elif ((active != 999) &
+            (self.stack.get_visible_child_name() == 'welcome')):
+            self.stack.set_visible_child_name('passage-view')
         self.library.set_module(active)
         self.settings.set_value('module', GLib.Variant('s', active))
 
