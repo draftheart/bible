@@ -25,6 +25,7 @@ from bible.booklist import BookList
 from bible.passageview import PassageView
 from bible.navbar import NavBar
 from bible.modulelist import ModuleList
+from bible.welcome import Welcome
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -130,10 +131,18 @@ class Window(Gtk.ApplicationWindow):
         self.overlay.add_overlay(self.navbar)
         self.navbar.show_navbar()
         self.overlay.set_overlay_pass_through(self.navbar, True)
-        self.overlay.set_size_request(600, -1)
+
+        self.welcome = Welcome()
+
+        self.stack = Gtk.Stack()
+        self.stack.set_size_request(600, -1)
+        self.stack.add_named(self.overlay, 'passage-view')
+        self.stack.add_named(self.welcome, 'welcome')
+
+        self.stack.set_visible_child_name('welcome')
 
         self.paned_view.pack1(self.scrolled, True, False)
-        self.paned_view.pack2(self.overlay, True, False)
+        self.paned_view.pack2(self.stack, True, False)
         self.settings.bind('pane-position',
             self.paned_view,
             'position',
