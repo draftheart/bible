@@ -54,3 +54,9 @@ class InstallManager(GObject.GObject):
         self.install_manager.setUserDisclaimerConfirmed()
         if confirmed:
             self.emit('disclaimer_confirmed')
+
+    def install_local(self, library, file):
+        return
+
+    def install_remote(self, library, source, module):
+        return

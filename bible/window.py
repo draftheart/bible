@@ -26,6 +26,7 @@ from bible.passageview import PassageView
 from bible.navbar import NavBar
 from bible.modulelist import ModuleList
 from bible.welcome import Welcome
+from bible.installdialog import InstallDialog
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -99,10 +100,14 @@ class Window(Gtk.ApplicationWindow):
         self.module_list = ModuleList(self.library)
         self.module_list.connect('changed', self._on_module_selected)
 
+        install_button = Gtk.Button.new_from_icon_name('document-import', Gtk.IconSize.LARGE_TOOLBAR)
+        install_button.connect('clicked', self._on_install_button_pressed)
+
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
         self.header.set_title('Bible')
         self.header.pack_start(self.module_list)
+        self.header.pack_end(install_button)
         self.set_titlebar(self.header)
 
         self.book_list = BookList(self.library)
@@ -170,6 +175,10 @@ class Window(Gtk.ApplicationWindow):
         if self.window_size_update_timeout is None:
             self.window_size_update_timeout = GLib.timeout_add(500,
                     self.store_window_size_and_position, widget)
+
+    def _on_install_button_pressed(self, button):
+        install_dialog = InstallDialog(self)
+        install_dialog.run()
 
     def _on_window_state_event(self, widget, event):
         self.settings.set_boolean('window-maximized',
