@@ -28,14 +28,15 @@ from gi.repository import GObject
 class InstallManager(GObject.GObject):
 
     __gsignals__ = {
-        'module_installed': (GObject.SIGNAL_RUN_FIRST, None, ())
-        'sources_refreshed': (GObject.SIGNAL_RUN_FIRST, None, ())
+        'module_installed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'sources_refreshed': (GObject.SIGNAL_RUN_FIRST, None, ()),
         'disclaimer_confirmed': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
-    def __init__(self):
+    def __init__(self, library):
         GObject.GObject.__init__(self)
-        self.install_manager = InstallMgr()
+        self._install_manager = InstallMgr()
+        self._library = library
 
     def refresh_source_list(self):
         r =  self.install_manager.refreshRemoteSourceConfiguration()
@@ -44,16 +45,28 @@ class InstallManager(GObject.GObject):
         self.emit('sources-refreshed')
         return True
 
+    def refresh_install_source(self):
+        if self._install_source != None:
+            self._install_manager.refreshRemoteSource(self._install_source)
+        else:
+            return False
+
     def get_source_list(self):
-        return self.install_manager.sources
+        source_list = []
+        for source in self.install_manager.sources:
+            source_list.append(source.c_str())
+        return source_list
 
     def get_user_disclaimer_confirmed(self):
-        return self.install_manager.isUserDisclaimerConfirmed()
+        return self._install_manager.isUserDisclaimerConfirmed()
+
+    def set_install_source(self, source):
+        self._install_source = self.install_manager.sources[SWBuf(source)]
 
     def set_user_disclaimer_confirmed(self, confirmed):
-        self.install_manager.setUserDisclaimerConfirmed()
+        self._install_manager.setUserDisclaimerConfirmed(confirmed)
         if confirmed:
-            self.emit('disclaimer_confirmed')
+            self.emit('disclaimer-confirmed')
 
     def install_local(self, library, file):
         return

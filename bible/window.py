@@ -27,6 +27,7 @@ from bible.navbar import NavBar
 from bible.modulelist import ModuleList
 from bible.welcome import Welcome
 from bible.installdialog import InstallDialog
+from bible.installmanager import InstallManager
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -112,13 +113,13 @@ class Window(Gtk.ApplicationWindow):
 
         self.book_list = BookList(self.library)
 
-        self.paned_view = Gtk.Paned(position=150)
+        self.paned_view = Gtk.Paned(position=160)
         self.paned_view.set_size_request(700, 400)
         self.restore_saved_pane_position()
 
         self.scrolled = Gtk.ScrolledWindow(None, None)
         self.scrolled.add(self.book_list)
-        self.scrolled.set_size_request(100, -1)
+        self.scrolled.set_size_request(150, -1)
 
         self.passage_view = PassageView(self.library)
 
@@ -177,8 +178,8 @@ class Window(Gtk.ApplicationWindow):
                     self.store_window_size_and_position, widget)
 
     def _on_install_button_pressed(self, button):
-        install_dialog = InstallDialog(self)
-        install_dialog.run()
+        install_manager = InstallManager(self.library)
+        install_dialog = InstallDialog(self, install_manager)
 
     def _on_window_state_event(self, widget, event):
         self.settings.set_boolean('window-maximized',

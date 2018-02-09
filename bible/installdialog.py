@@ -20,30 +20,48 @@
 """
 
 from bible.modulerow import ModuleRow
+from bible.modulelistbox import ModuleListBox
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+gi.require_version('Granite', '1.0')
+from gi.repository import Gtk, Granite
 
-class InstallDialog(Gtk.Dialog):
-    def __init__(self, parent):
-        Gtk.Dialog.__init__(self, parent=parent)
+class InstallDialog(Gtk.Window):
+    def __init__(self, parent, install_manager):
+        Gtk.Window.__init__(self,
+            transient_for=parent,
+            modal=True,
+            window_position = Gtk.WindowPosition.CENTER_ON_PARENT)
+        self._install_manager = install_manager
         self.setup_widgets()
         self.show_all()
 
     def setup_widgets(self):
-        module_list = Gtk.ListBox()
-        module1 = ModuleRow('ESV2011', 'This is a really good translation.')
-        module2 = ModuleRow('KJV', 'This is a really old translation.')
-        module_list.add(module1)
-        module_list.add(module2)
+        self.set_title('Bible Installer')
+        alert = Granite.WidgetsAlertView()
+        alert.set_title('Warning')
+        alert.set_description('If you live in a persecuted country, download Bibles with care.')
+        alert.set_icon_name('dialog-warning')
+        alert.show_action('I Accept Responsibility')
+        alert.connect('action-activated', self._on_action_activated)
 
-        content_area = self.get_content_area()
-        content_area.add(module_list)
+        installer = Gtk.Grid()
 
-        self.add_button('Close', Gtk.ResponseType.CLOSE)
-        self.connect('response', self._on_response)
+        self.stack = Gtk.Stack()
+        self.stack.add_named(alert, 'alert')
+        self.stack.add_named(installer, 'installer')
+
+        self.add(self.stack)
+        if self._install_manager.get_user_disclaimer_confirmed():
+            self.stack.set_visible_child_name('installer')
+        else:
+            self.stack.set_visible_child_name('alert')
 
     def _on_response(self, dialog, response):
         if (response == Gtk.ResponseType.CLOSE):
             dialog.close()
+
+    def _on_action_activated(self, button):
+        self._install_manager.set_user_disclaimer_confirmed(True)
+        self.stack.set_visible_child_name('installer')

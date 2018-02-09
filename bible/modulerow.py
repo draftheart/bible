@@ -21,13 +21,14 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Pango
 
 class ModuleRow(Gtk.ListBoxRow):
     def __init__(self, name, description):
         Gtk.ListBoxRow.__init__(self)
         self.name = name
         self.description = description
+        self.set_tooltip_text(self.description)
         self.setup_widgets()
 
     def setup_widgets(self):
@@ -43,8 +44,8 @@ class ModuleRow(Gtk.ListBoxRow):
         module_name.props.xalign = 0
 
         module_description = Gtk.Label(self.description)
-        module_name.props.valign = Gtk.Align.END
-        module_name.props.xalign = 0
+        module_description.props.valign = Gtk.Align.END
+        module_description.props.xalign = 0
 
         info_grid = Gtk.Grid()
         info_grid.props.column_spacing = 12
