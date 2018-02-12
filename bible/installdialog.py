@@ -46,7 +46,14 @@ class InstallDialog(Gtk.Window):
         alert.show_action('I Accept Responsibility')
         alert.connect('action-activated', self._on_action_activated)
 
-        installer = Gtk.Grid()
+        installer = Gtk.Paned()
+        scrolled = Gtk.ScrolledWindow()
+        scrolled.set_size_request(200, -1)
+        module_info = Gtk.Grid()
+        module_list = ModuleListBox()
+        scrolled.add(module_list)
+        installer.add1(scrolled)
+        installer.add2(module_info)
 
         self.stack = Gtk.Stack()
         self.stack.add_named(alert, 'alert')
