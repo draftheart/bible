@@ -26,7 +26,4 @@ from gi.repository import Gtk
 class ModuleListBox(Gtk.ListBox):
     def __init__(self):
         Gtk.ListBox.__init__(self)
-        self.setup_widgets()
-
-    def setup_widgets(self):
-        return
+        self.show_all()

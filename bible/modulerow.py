@@ -24,12 +24,16 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Pango
 
 class ModuleRow(Gtk.ListBoxRow):
-    def __init__(self, name, description):
+
+    def __init__(self, name, description=''):
         Gtk.ListBoxRow.__init__(self)
         self.name = name
         self.description = description
-        self.set_tooltip_text(self.description)
+        self.installed = False
+        self.update_available = False
+        self.status_icon = Gtk.Image()
         self.setup_widgets()
+        self.show_all()
 
     def setup_widgets(self):
         main_grid = Gtk.Grid()
@@ -46,6 +50,8 @@ class ModuleRow(Gtk.ListBoxRow):
         module_description = Gtk.Label(self.description)
         module_description.props.valign = Gtk.Align.END
         module_description.props.xalign = 0
+        module_description.set_ellipsize(Pango.EllipsizeMode.END)
+        module_description.set_tooltip_text(self.description)
 
         info_grid = Gtk.Grid()
         info_grid.props.column_spacing = 12
@@ -54,15 +60,40 @@ class ModuleRow(Gtk.ListBoxRow):
         info_grid.attach(module_name, 0, 0, 1, 1)
         info_grid.attach(module_description, 0, 1, 1, 1)
 
-        button_grid = Gtk.Grid()
-        button_grid.props.hexpand = True
-        button_grid.props.column_spacing = 6
-        button_grid.props.halign = Gtk.Align.END
-        button_grid.props.valign = Gtk.Align.CENTER
+        status_grid = Gtk.Grid()
+        status_grid.props.hexpand = False
+        status_grid.props.column_spacing = 6
+        status_grid.props.halign = Gtk.Align.CENTER
+        status_grid.props.valign = Gtk.Align.CENTER
 
-        action_button = Gtk.Button.new_with_label('Install')
-        button_grid.add(action_button)
+        self.status_icon.set_from_icon_name('user-offline', Gtk.IconSize.SMALL_TOOLBAR)
+        self.status_icon.set_tooltip_text('Not Installed')
 
-        main_grid.attach(info_grid, 0, 0, 1, 1)
-        main_grid.attach(button_grid,1,0,1,1)
+        status_grid.add(self.status_icon)
+
+        main_grid.attach(status_grid, 0, 0, 1, 1)
+        main_grid.attach(info_grid, 1, 0, 1, 1)
         self.add(main_grid)
+
+    def set_installed(self, installed):
+
+        self.installed = installed
+
+        if installed:
+            self.status_icon.set_from_icon_name('user-available', Gtk.IconSize.SMALL_TOOLBAR)
+            self.status_icon.set_tooltip_text('Installed')
+        else:
+            self.status_icon.set_from_icon_name('user-offline', Gtk.IconSize.SMALL_TOOLBAR)
+            self.status_icon.set_tooltip_text('Not Installed')
+
+    def set_upgrade_available(self, upgrade_available):
+
+        self.upgrade_available = upgrade_available
+
+        if upgrade_available:
+            self.status_icon.set_from_icon_name('user-idle', Gtk.IconSize.SMALL_TOOLBAR)
+            self.status_icon.set_tooltip_text('Upgrade Available')
+        elif installed and not upgrade_available:
+            self.set_installed(True)
+        else:
+            self.set_installed(False)

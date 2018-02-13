@@ -19,8 +19,9 @@
     Authored by: Dane Henson <thegreatdane@gmail.com>
 """
 
-from Sword import InstallMgr
+from Sword import InstallMgr, SWBuf, SWMgr
 
+import os
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject
@@ -33,23 +34,39 @@ class InstallManager(GObject.GObject):
         'disclaimer_confirmed': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
+    class ModStat:
+        CIPHERED = InstallMgr.MODSTAT_CIPHERED
+        CIPHERKEYPRESENT = InstallMgr.MODSTAT_CIPHERKEYPRESENT
+        NEW = InstallMgr.MODSTAT_NEW
+        OLDER = InstallMgr.MODSTAT_OLDER
+        SAMEVERSION = InstallMgr.MODSTAT_SAMEVERSION
+        UPDATED = InstallMgr.MODSTAT_UPDATED
+
     def __init__(self, library):
         GObject.GObject.__init__(self)
-        self._install_manager = InstallMgr()
+        settings_path = os.path.join(os.path.expanduser('~'), '.sword/InstallMgr')
+        self._install_manager = InstallMgr(settings_path)
         self._library = library
 
     def refresh_source_list(self):
-        r =  self.install_manager.refreshRemoteSourceConfiguration()
-        if (r != 0):
-            return False
+        r =  self._install_manager.refreshRemoteSourceConfiguration()
         self.emit('sources-refreshed')
-        return True
 
     def refresh_install_source(self):
         if self._install_source != None:
             self._install_manager.refreshRemoteSource(self._install_source)
-        else:
-            return False
+            self.emit('sources-refreshed')
+
+    def get_module_list(self):
+        bibles = {}
+        if (self._library != None) & (self._install_source != None):
+            mods = self._install_manager.getModuleStatus(self._library.get_manager(),
+                                                         self._install_source.getMgr())
+            modtype_bibles = SWMgr().MODTYPE_BIBLES
+            for mod in mods:
+                if (mod.getType() == modtype_bibles):
+                    bibles[mod] = mods[mod]
+            return bibles
 
     def get_source_list(self):
         source_list = []
@@ -61,15 +78,15 @@ class InstallManager(GObject.GObject):
         return self._install_manager.isUserDisclaimerConfirmed()
 
     def set_install_source(self, source):
-        self._install_source = self.install_manager.sources[SWBuf(source)]
+        self._install_source = self._install_manager.sources[SWBuf(source)]
 
     def set_user_disclaimer_confirmed(self, confirmed):
         self._install_manager.setUserDisclaimerConfirmed(confirmed)
         if confirmed:
             self.emit('disclaimer-confirmed')
 
-    def install_local(self, library, file):
+    def install_local(self, file):
         return
 
-    def install_remote(self, library, source, module):
+    def install_remote(self, module):
         return

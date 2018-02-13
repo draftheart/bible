@@ -101,6 +101,9 @@ class Library(GObject.GObject):
                             return [t, b, c]
         return [1, 1, 1]
 
+    def get_manager(self):
+        return self._lib
+
     def get_passage_valid(self):
         if (self._module != None):
             return self._module.hasEntry(self._vk)
@@ -123,6 +126,9 @@ class Library(GObject.GObject):
     def set_chapter(self, chapter):
         self._vk.setChapter(chapter)
         self.emit('reference_changed')
+
+    def set_manager(self, manager):
+        self._lib = manager
 
     def set_module(self, module):
         self._module = self._lib.getModule(module)
