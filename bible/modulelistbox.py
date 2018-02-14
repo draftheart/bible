@@ -26,4 +26,17 @@ from gi.repository import Gtk
 class ModuleListBox(Gtk.ListBox):
     def __init__(self):
         Gtk.ListBox.__init__(self)
+        self.set_sort_func(self._sort_func, None)
         self.show_all()
+
+    def _sort_func(self, row1, row2, user_data):
+        if row1.installed and not row2.installed:
+            return -1
+        if not row1.installed and row2.installed:
+            return 1
+        if row1.get_name() < row2.get_name():
+            return -1
+        elif row1.get_name() == row2.get_name():
+            return 0
+        else:
+            return 1

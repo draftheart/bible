@@ -47,6 +47,7 @@ class InstallManager(GObject.GObject):
         settings_path = os.path.join(os.path.expanduser('~'), '.sword/InstallMgr')
         self._install_manager = InstallMgr(settings_path)
         self._library = library
+        self._selected_module = None
 
     def refresh_source_list(self):
         r =  self._install_manager.refreshRemoteSourceConfiguration()
@@ -85,8 +86,28 @@ class InstallManager(GObject.GObject):
         if confirmed:
             self.emit('disclaimer-confirmed')
 
-    def install_local(self, file):
+    def install_local_module(self, file):
         return
 
-    def install_remote(self, module):
+    def install_selected_module(self):
+        """TODO:Implement Installing Remote Module"""
         return
+
+    def remove_selected_module(self):
+        """TODO:Implement Remove Module"""
+        return
+
+    def set_selected_module(self, mod):
+        self._selected_module = mod
+
+    def get_module_name(self):
+        return self._selected_module.getName()
+
+    def get_module_description(self):
+        return self._selected_module.getDescription()
+
+    def get_module_about(self):
+        return self._selected_module.getConfigEntry('About')
+
+    def get_module_version(self):
+        return self._selected_module.getConfigEntry('Version')

@@ -21,6 +21,7 @@
 
 from bible.modulerow import ModuleRow
 from bible.modulelistbox import ModuleListBox
+from bible.moduleviewer import ModuleViewer
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -47,10 +48,11 @@ class InstallDialog(Gtk.Window):
         alert.connect('action-activated', self._on_action_activated)
 
         installer = Gtk.Paned(position=210)
-        module_info = Gtk.Grid()
-        module_info.set_size_request(200, -1)
+        self.module_info = ModuleViewer()
+        self.module_info.set_size_request(200, -1)
 
         self.module_list = ModuleListBox()
+        self.module_list.connect('row-selected', self._on_module_selected)
 
         scrolled = Gtk.ScrolledWindow(None, None)
         scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -58,7 +60,7 @@ class InstallDialog(Gtk.Window):
         scrolled.add(self.module_list)
 
         installer.pack1(scrolled, True, False)
-        installer.pack2(module_info, True, False)
+        installer.pack2(self.module_info, True, False)
 
         self.stack = Gtk.Stack()
         self.stack.add_named(alert, 'alert')
@@ -75,13 +77,13 @@ class InstallDialog(Gtk.Window):
         self._install_manager.set_user_disclaimer_confirmed(True)
         self.stack.set_visible_child_name('installer')
         self._install_manager.refresh_source_list()
-        self._install_manager.set_install_source('Bible.org')
+        self._install_manager.set_install_source('CrossWire')
         self._populate_module_list()
 
     def _populate_module_list(self):
         mods = self._install_manager.get_module_list()
         for k in mods.keys():
-            mod = ModuleRow(k.getName(), k.getDescription())
+            mod = ModuleRow(k)
             if (mods[k] == self._install_manager.ModStat.SAMEVERSION):
                 mod.set_installed(True)
             elif (mods[k] == self._install_manager.ModStat.UPDATED):
@@ -90,3 +92,9 @@ class InstallDialog(Gtk.Window):
             else:
                 mod.set_installed(False)
             self.module_list.add(mod)
+
+    def _on_module_selected(self, list_box, row):
+        if row.module != None:
+            self._install_manager.set_selected_module(row.module)
+            self.module_info.set_module(row.module)
+            self.module_info.refresh_view()

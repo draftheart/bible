@@ -21,14 +21,13 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Pango
+from gi.repository import Gtk, Pango, GObject
 
 class ModuleRow(Gtk.ListBoxRow):
 
-    def __init__(self, name, description=''):
+    def __init__(self, module):
         Gtk.ListBoxRow.__init__(self)
-        self.name = name
-        self.description = description
+        self.module = module
         self.installed = False
         self.update_available = False
         self.status_icon = Gtk.Image()
@@ -42,16 +41,16 @@ class ModuleRow(Gtk.ListBoxRow):
         main_grid.props.margin_start = 12
         main_grid.props.margin_end = 12
 
-        module_name = Gtk.Label(self.name)
+        module_name = Gtk.Label(self.module.getName())
         module_name.get_style_context().add_class('h3')
         module_name.props.valign = Gtk.Align.END
         module_name.props.xalign = 0
 
-        module_description = Gtk.Label(self.description)
+        module_description = Gtk.Label(self.module.getDescription())
         module_description.props.valign = Gtk.Align.END
         module_description.props.xalign = 0
         module_description.set_ellipsize(Pango.EllipsizeMode.END)
-        module_description.set_tooltip_text(self.description)
+        module_description.set_tooltip_text(self.module.getDescription())
 
         info_grid = Gtk.Grid()
         info_grid.props.column_spacing = 12
@@ -61,7 +60,6 @@ class ModuleRow(Gtk.ListBoxRow):
         info_grid.attach(module_description, 0, 1, 1, 1)
 
         status_grid = Gtk.Grid()
-        status_grid.props.hexpand = False
         status_grid.props.column_spacing = 6
         status_grid.props.halign = Gtk.Align.CENTER
         status_grid.props.valign = Gtk.Align.CENTER
@@ -97,3 +95,9 @@ class ModuleRow(Gtk.ListBoxRow):
             self.set_installed(True)
         else:
             self.set_installed(False)
+
+    def get_name(self):
+        return self.module.getName()
+
+    def get_description(self):
+        return self.module.getDescription()
