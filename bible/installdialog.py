@@ -77,7 +77,7 @@ class InstallDialog(Gtk.Window):
         self._install_manager.set_user_disclaimer_confirmed(True)
         self.stack.set_visible_child_name('installer')
         self._install_manager.refresh_source_list()
-        self._install_manager.set_install_source('CrossWire')
+        self._install_manager.set_install_source('Bible.org')
         self._populate_module_list()
 
     def _populate_module_list(self):
@@ -94,7 +94,7 @@ class InstallDialog(Gtk.Window):
             self.module_list.add(mod)
 
     def _on_module_selected(self, list_box, row):
-        if row.module != None:
+        if row != None:
             self._install_manager.set_selected_module(row.module)
             self.module_info.set_module(row.module)
             self.module_info.refresh_view()

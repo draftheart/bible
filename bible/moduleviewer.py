@@ -21,7 +21,7 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Pango
 
 class ModuleViewer(Gtk.ScrolledWindow):
 
@@ -36,27 +36,44 @@ class ModuleViewer(Gtk.ScrolledWindow):
 
     def _setup_widgets(self):
         main_grid = Gtk.Grid()
-        main_grid.props.column_spacing = 24
-        main_grid.props.margin = 6
-        main_grid.props.margin_start = 12
-        main_grid.props.margin_end = 12
+        main_grid.props.expand = True
+        main_grid.props.column_spacing = 12
+        main_grid.props.halign = Gtk.Align.FILL
+        main_grid.props.margin = 12
+
+        banner_grid = Gtk.Grid()
+        banner_grid.props.expand = False
+        banner_grid.props.column_spacing = 12
 
         self.module_name = Gtk.Label()
-        self.module_name.get_style_context().add_class('h2')
-        self.module_name.props.valign = Gtk.Align.END
+        self.module_name.props.margin_top = 12
+        self.module_name.get_style_context().add_class('h1')
+        self.module_name.props.valign = Gtk.Align.CENTER
         self.module_name.props.xalign = 0
 
         self.module_description = Gtk.Label()
+        self.module_description.props.xalign = 0
+        self.module_description.set_ellipsize(Pango.EllipsizeMode.END)
+        self.module_description.get_style_context().add_class('h3')
 
         self.module_version = Gtk.Label()
+        self.module_version.props.xalign = 0
+        self.module_version.get_style_context().add_class('h3')
 
         self.module_about = Gtk.Label()
+        self.module_about.props.xalign = 0
+        self.module_about.props.margin_top = 12
+        self.module_about.props.expand = True
         self.module_about.set_line_wrap(True)
+        self.module_about.props.valign = Gtk.Align.START
+        self.module_about.props.halign = Gtk.Align.START
 
-        main_grid.attach(self.module_name, 0, 0, 1, 1)
-        main_grid.attach(self.module_version, 1, 0, 1, 1)
-        main_grid.attach(self.module_description, 0, 1, 2, 1)
-        main_grid.attach(self.module_about, 0, 2, 2, 1)
+        banner_grid.attach(self.module_name, 0, 0, 1, 1)
+        banner_grid.attach(self.module_version, 1, 0, 1, 1)
+
+        main_grid.attach(banner_grid, 0, 0, 1, 1)
+        main_grid.attach(self.module_description, 0, 1, 1, 1)
+        main_grid.attach(self.module_about, 0, 2, 1, 1)
 
         self.add(main_grid)
 
@@ -65,4 +82,6 @@ class ModuleViewer(Gtk.ScrolledWindow):
             self.module_name.set_text(self.module.getName())
             self.module_description.set_text(self.module.getDescription())
             self.module_version.set_text(self.module.getConfigEntry('Version'))
-            self.module_about.set_text(self.module.getConfigEntry('About'))
+            about_text = self.module.getConfigEntry('About')
+            about_text = about_text.replace("\\par", '\n')
+            self.module_about.set_text(about_text)
