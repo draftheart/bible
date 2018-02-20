@@ -32,6 +32,7 @@ class ModuleRow(Gtk.ListBoxRow):
         self.update_available = False
         self.status_icon = Gtk.Image()
         self.setup_widgets()
+        self.set_installed(self.installed)
         self.show_all()
 
     def setup_widgets(self):
