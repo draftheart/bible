@@ -20,18 +20,18 @@
 """
 
 from Sword import InstallMgr, SWBuf, SWMgr
+from bible.async import async_method
 
-import os
-import gi
+import os, gi
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject
 
 class InstallManager(GObject.GObject):
 
     __gsignals__ = {
-        'module_installed': (GObject.SIGNAL_RUN_FIRST, None, ()),
-        'sources_refreshed': (GObject.SIGNAL_RUN_FIRST, None, ()),
-        'disclaimer_confirmed': (GObject.SIGNAL_RUN_FIRST, None, ())
+        'modules_refreshed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'source_list_refreshed': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
     class ModStat:
@@ -49,16 +49,17 @@ class InstallManager(GObject.GObject):
         self._library = library
         self._selected_module = None
 
+    @async_method(on_done = lambda self, result, error: self.on_source_list_refreshed(result, error))
     def refresh_source_list(self):
-        r =  self._install_manager.refreshRemoteSourceConfiguration()
-        self.emit('sources-refreshed')
+        self._install_manager.refreshRemoteSourceConfiguration()
 
+    @async_method
     def refresh_install_source(self):
         if self._install_source != None:
             self._install_manager.refreshRemoteSource(self._install_source)
-            self.emit('sources-refreshed')
 
-    def get_module_list(self):
+    @async_method(on_done = lambda self, result, error: self.on_modules_refreshed(result, error))
+    def refresh_module_list(self):
         bibles = {}
         if (self._library != None) & (self._install_source != None):
             mods = self._install_manager.getModuleStatus(self._library.get_manager(),
@@ -67,7 +68,15 @@ class InstallManager(GObject.GObject):
             for mod in mods:
                 if (mod.getType() == modtype_bibles):
                     bibles[mod] = mods[mod]
-            return bibles
+        return bibles
+
+    def on_modules_refreshed(self, result, error):
+        self.bibles = result
+        self.emit('modules-refreshed')
+
+    def on_source_list_refreshed(self, result, error):
+        self.emit('source-list-refreshed')
+        return
 
     def get_source_list(self):
         source_list = []
@@ -83,8 +92,6 @@ class InstallManager(GObject.GObject):
 
     def set_user_disclaimer_confirmed(self, confirmed):
         self._install_manager.setUserDisclaimerConfirmed(confirmed)
-        if confirmed:
-            self.emit('disclaimer-confirmed')
 
     def install_local_module(self, file):
         return

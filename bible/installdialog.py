@@ -23,10 +23,11 @@ from bible.modulerow import ModuleRow
 from bible.modulelistbox import ModuleListBox
 from bible.moduleviewer import ModuleViewer
 
+import threading
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Granite', '1.0')
-from gi.repository import Gtk, Granite
+from gi.repository import Gtk, GLib, Granite
 
 class InstallDialog(Gtk.Window):
     def __init__(self, parent, install_manager):
@@ -62,26 +63,46 @@ class InstallDialog(Gtk.Window):
         installer.pack1(scrolled, True, False)
         installer.pack2(self.module_info, True, False)
 
+        spinner_grid = Gtk.Grid()
+        spinner_grid.props.halign = Gtk.Align.CENTER
+        spinner_grid.props.valign = Gtk.Align.CENTER
+        self.spinner = Gtk.Spinner()
+        spinner_grid.add(self.spinner)
+
         self.stack = Gtk.Stack()
         self.stack.add_named(alert, 'alert')
         self.stack.add_named(installer, 'installer')
+        self.stack.add_named(spinner_grid, 'spinner')
         self.stack.set_size_request(700, 400)
 
         self.add(self.stack)
         if self._install_manager.get_user_disclaimer_confirmed():
-            self.stack.set_visible_child_name('installer')
+            self.spinner.start()
+            self.stack.set_visible_child_name('spinner')
         else:
             self.stack.set_visible_child_name('alert')
 
+        self._install_manager.connect('source-list-refreshed', self._on_source_list_refreshed)
+        self._install_manager.connect('modules-refreshed', self._on_modules_refreshed)
+
     def _on_action_activated(self, button):
         self._install_manager.set_user_disclaimer_confirmed(True)
-        self.stack.set_visible_child_name('installer')
+        self.spinner.start()
+        self.stack.set_visible_child_name('spinner')
         self._install_manager.refresh_source_list()
+
+    def _on_source_list_refreshed(self, install_manager):
         self._install_manager.set_install_source('CrossWire')
+        self._install_manager.refresh_module_list()
+
+    def _on_modules_refreshed(self, install_manager):
         self._populate_module_list()
+        if (self.stack.get_visible_child_name() != 'installer'):
+            self.spinner.stop()
+            self.stack.set_visible_child_name('installer')
 
     def _populate_module_list(self):
-        mods = self._install_manager.get_module_list()
+        mods = self._install_manager.bibles
         for k in mods.keys():
             mod = ModuleRow(k)
             if (mods[k] == self._install_manager.ModStat.SAMEVERSION):
@@ -92,6 +113,9 @@ class InstallDialog(Gtk.Window):
             else:
                 mod.set_installed(False)
             self.module_list.add(mod)
+        row = self.module_list.get_row_at_index(0)
+        if row != None:
+            self.module_list.select_row(row)
 
     def _on_module_selected(self, list_box, row):
         if row != None:
