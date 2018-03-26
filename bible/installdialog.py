@@ -120,5 +120,5 @@ class InstallDialog(Gtk.Window):
     def _on_module_selected(self, list_box, row):
         if row != None:
             self._install_manager.set_selected_module(row.module)
-            self.module_info.set_module(row.module)
+            self.module_info.set_module(row.module, row.installed)
             self.module_info.refresh_view()

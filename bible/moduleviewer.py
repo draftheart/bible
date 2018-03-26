@@ -31,11 +31,13 @@ class ModuleViewer(Gtk.ScrolledWindow):
 
     def __init__(self):
         Gtk.ScrolledWindow.__init__(self)
-        self._setup_widgets()
         self.module = None
+        self.installed = False
+        self._setup_widgets()
 
-    def set_module(self, module):
+    def set_module(self, module, installed):
         self.module = module
+        self.installed = installed
 
     def _setup_widgets(self):
         main_grid = Gtk.Grid()
@@ -107,6 +109,11 @@ class ModuleViewer(Gtk.ScrolledWindow):
             self._module_description.set_text(self.module.getDescription())
             self._module_version.set_text(self.module.getConfigEntry('Version'))
             self._module_language.set_text('({})'.format(self.module.getLanguage()))
+
+            if self.installed:
+                self._action_button.set_label('Uninstall')
+            else:
+                self._action_button.set_label('Install')
 
             about_text = self.module.getConfigEntry('About')
             about_text = about_text.replace("\\par", '\n')
