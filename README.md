@@ -29,13 +29,15 @@ Bible is designed and developed on and for [elementaryOS](https://elementary.io)
 
 If you are the adventurous type, you can pull this code and play with it to your heart's content.
 
-You will need the following packages:
+You will need the following dependencies:
 
 * python (2.7)
 * libsword
-* libgtk-3-dev
+* libgtk-3
+* libwebkitgtk2-4.0
 
 Build and install:
 
 	python setup.py build
 	sudo python setup.py install
+
