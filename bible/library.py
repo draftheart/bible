@@ -22,7 +22,7 @@
 from gi.repository import GObject
 from Sword import SWMgr, SWModule, SWBuf, VerseKey, OSISHTMLHREF, MarkupFilterMgr
 
-import gi
+import os, gi
 gi.require_version('Gtk', '3.0')
 
 class Library(GObject.GObject):
@@ -35,7 +35,8 @@ class Library(GObject.GObject):
     def __init__(self):
         GObject.GObject.__init__(self)
         self._filter_manager = MarkupFilterMgr(10, 2)
-        self._lib = SWMgr(self._filter_manager)
+        settings_path = os.path.join(os.path.expanduser('~'), '.sword')
+        self._lib = SWMgr(settings_path, True, self._filter_manager)
         self._lib.setGlobalOption('Headings', 'On')
 
         self._module = self._lib.getModuleAt(0)

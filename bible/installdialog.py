@@ -51,6 +51,7 @@ class InstallDialog(Gtk.Window):
         installer = Gtk.Paned(position=210)
         self.module_info = ModuleViewer()
         self.module_info.set_size_request(200, -1)
+        self.module_info.connect('action-button-clicked', self._on_moduleviewer_action_activated)
 
         self.module_list = ModuleListBox()
         self.module_list.connect('row-selected', self._on_module_selected)
@@ -84,6 +85,7 @@ class InstallDialog(Gtk.Window):
 
         self._install_manager.connect('source-list-refreshed', self._on_source_list_refreshed)
         self._install_manager.connect('modules-refreshed', self._on_modules_refreshed)
+        self._install_manager.connect('module-installed', self._on_module_installed)
 
     def _on_action_activated(self, button):
         self._install_manager.set_user_disclaimer_confirmed(True)
@@ -117,8 +119,14 @@ class InstallDialog(Gtk.Window):
         if row != None:
             self.module_list.select_row(row)
 
+    def _on_module_installed(self, install_manager):
+        print('Job Done!')
+
     def _on_module_selected(self, list_box, row):
         if row != None:
             self._install_manager.set_selected_module(row.module)
             self.module_info.set_module(row.module, row.installed, row.update_available)
             self.module_info.refresh_view()
+
+    def _on_moduleviewer_action_activated(self, module_viewer):
+        self._install_manager.install_selected_module()

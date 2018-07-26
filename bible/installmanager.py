@@ -31,7 +31,8 @@ class InstallManager(GObject.GObject):
 
     __gsignals__ = {
         'modules_refreshed': (GObject.SIGNAL_RUN_FIRST, None, ()),
-        'source_list_refreshed': (GObject.SIGNAL_RUN_FIRST, None, ())
+        'source_list_refreshed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'module_installed': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
     class ModStat:
@@ -46,6 +47,7 @@ class InstallManager(GObject.GObject):
         GObject.GObject.__init__(self)
         settings_path = os.path.join(os.path.expanduser('~'), '.sword/InstallMgr')
         self._install_manager = InstallMgr(settings_path)
+        self._install_manager.setFTPPassive(True)
         self._library = library
         self._selected_module = None
 
@@ -53,7 +55,7 @@ class InstallManager(GObject.GObject):
     def refresh_source_list(self):
         self._install_manager.refreshRemoteSourceConfiguration()
 
-    @async_method
+    @async_method(on_done = lambda self, result, error: self.on_install_sources_refreshed(result, error))
     def refresh_install_source(self):
         if self._install_source != None:
             self._install_manager.refreshRemoteSource(self._install_source)
@@ -61,7 +63,7 @@ class InstallManager(GObject.GObject):
     @async_method(on_done = lambda self, result, error: self.on_modules_refreshed(result, error))
     def refresh_module_list(self):
         bibles = {}
-        if (self._library != None) & (self._install_source != None):
+        if self._library != None and self._install_source != None:
             mods = self._install_manager.getModuleStatus(self._library.get_manager(),
                                                          self._install_source.getMgr())
             modtype_bibles = SWMgr().MODTYPE_BIBLES
@@ -70,13 +72,18 @@ class InstallManager(GObject.GObject):
                     bibles[mod] = mods[mod]
         return bibles
 
+    def on_install_sources_refreshed(self, result, error):
+        return
+
+    def on_module_installed(self, result, error):
+        self.emit('module-installed')
+
     def on_modules_refreshed(self, result, error):
         self.bibles = result
         self.emit('modules-refreshed')
 
     def on_source_list_refreshed(self, result, error):
         self.emit('source-list-refreshed')
-        return
 
     def get_source_list(self):
         source_list = []
@@ -96,8 +103,13 @@ class InstallManager(GObject.GObject):
     def install_local_module(self, file):
         return
 
+    @async_method(on_done = lambda self, result, error: self.on_module_installed(result, error))
     def install_selected_module(self):
-        """TODO:Implement Installing Remote Module"""
+        if self._install_source != None:
+            self._install_manager.installModule(self._library.get_manager(),
+                '0',
+                self.get_module_name(),
+                self._install_manager.sources[SWBuf('CrossWire')])
         return
 
     def remove_selected_module(self):
