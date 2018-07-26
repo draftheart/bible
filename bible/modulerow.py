@@ -85,14 +85,14 @@ class ModuleRow(Gtk.ListBoxRow):
             self.status_icon.set_from_icon_name('user-offline', Gtk.IconSize.SMALL_TOOLBAR)
             self.status_icon.set_tooltip_text('Not Installed')
 
-    def set_upgrade_available(self, upgrade_available):
+    def set_update_available(self, update_available):
 
-        self.upgrade_available = upgrade_available
+        self.update_available = update_available
 
-        if upgrade_available:
+        if update_available:
             self.status_icon.set_from_icon_name('user-idle', Gtk.IconSize.SMALL_TOOLBAR)
-            self.status_icon.set_tooltip_text('Upgrade Available')
-        elif installed and not upgrade_available:
+            self.status_icon.set_tooltip_text('Update Available')
+        elif installed and not update_available:
             self.set_installed(True)
         else:
             self.set_installed(False)

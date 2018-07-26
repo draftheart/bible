@@ -109,7 +109,7 @@ class InstallDialog(Gtk.Window):
                 mod.set_installed(True)
             elif (mods[k] == self._install_manager.ModStat.UPDATED):
                 mod.set_installed(True)
-                mod.set_upgrade_available(True)
+                mod.set_update_available(True)
             else:
                 mod.set_installed(False)
             self.module_list.add(mod)
@@ -120,5 +120,5 @@ class InstallDialog(Gtk.Window):
     def _on_module_selected(self, list_box, row):
         if row != None:
             self._install_manager.set_selected_module(row.module)
-            self.module_info.set_module(row.module, row.installed)
+            self.module_info.set_module(row.module, row.installed, row.update_available)
             self.module_info.refresh_view()

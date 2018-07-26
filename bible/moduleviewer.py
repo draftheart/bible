@@ -33,11 +33,13 @@ class ModuleViewer(Gtk.ScrolledWindow):
         Gtk.ScrolledWindow.__init__(self)
         self.module = None
         self.installed = False
+        self.update_available = False
         self._setup_widgets()
 
-    def set_module(self, module, installed):
+    def set_module(self, module, installed, update_available):
         self.module = module
         self.installed = installed
+        self.update_available = update_available
 
     def _setup_widgets(self):
         main_grid = Gtk.Grid()
@@ -110,9 +112,11 @@ class ModuleViewer(Gtk.ScrolledWindow):
             self._module_version.set_text(self.module.getConfigEntry('Version'))
             self._module_language.set_text('({})'.format(self.module.getLanguage()))
 
-            if self.installed:
+            if self.installed and not self.update_available:
                 self._action_button.set_label('Uninstall')
-            else:
+            if self.installed and self.update_available:
+                self._action_button.set_label('Update')
+            if not self.installed:
                 self._action_button.set_label('Install')
 
             about_text = self.module.getConfigEntry('About')
