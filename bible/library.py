@@ -35,12 +35,13 @@ class Library(GObject.GObject):
     def __init__(self):
         GObject.GObject.__init__(self)
         self._filter_manager = MarkupFilterMgr(10, 2)
+        self.setup_settings_path()
         settings_path = os.path.join(os.path.expanduser('~'), '.sword')
         self._lib = SWMgr(settings_path, True, self._filter_manager)
         self._lib.setGlobalOption('Headings', 'On')
 
+        self._vk = VerseKey()
         self._module = None
-        self._vk = None
 
         self._make_mod_lists()
         if len(self.bibles) > 0:
@@ -58,21 +59,22 @@ class Library(GObject.GObject):
         </html>
         """
 
+    def setup_settings_path(self):
+        mods_path = os.path.join(os.path.expanduser('~'), '.sword', 'mods.d')
+        if not os.path.isdir(mods_path):
+            os.mkdir(mods_path)
+
     def get_book(self):
-        if self._vk != None:
-            return ord(self._vk.getBook())
+        return ord(self._vk.getBook())
 
     def get_book_name(self):
-        if self._vk != None:
-            return self._vk.getBookName()
+        return self._vk.getBookName()
 
     def get_chapter(self):
-        if self._vk != None:
-            return self._vk.getChapter()
+        return self._vk.getChapter()
 
     def get_chapter_max(self):
-        if self._vk != None:
-            return self._vk.getChapterMax()
+        return self._vk.getChapterMax()
 
     def get_entry_attribute(self, level1, level2, level3):
         l1 = SWBuf(level1)
@@ -129,14 +131,12 @@ class Library(GObject.GObject):
         return False
 
     def set_book(self, book):
-        if self._vk != None:
-            self._vk.setBook(book)
-            self.emit('reference_changed')
+        self._vk.setBook(book)
+        self.emit('reference_changed')
 
     def set_chapter(self, chapter):
-        if self._vk != None:
-            self._vk.setChapter(chapter)
-            self.emit('reference_changed')
+        self._vk.setChapter(chapter)
+        self.emit('reference_changed')
 
     def set_manager(self, manager):
         self._lib = manager
@@ -148,32 +148,27 @@ class Library(GObject.GObject):
         self.emit('module_changed')
 
     def set_reference(self, testament, book, chapter, verse):
-        if self._vk != None:
-            self._vk.setTestament(testament)
-            self._vk.setBook(book)
-            self._vk.setChapter(chapter)
-            self._vk.setVerse(verse)
-            self.emit('reference_changed')
+        self._vk.setTestament(testament)
+        self._vk.setBook(book)
+        self._vk.setChapter(chapter)
+        self._vk.setVerse(verse)
+        self.emit('reference_changed')
 
     def set_testament(self, testament):
-        if self._vk != None:
-            self._vk.setTestament(testament)
-            self.emit('reference_changed')
+        self._vk.setTestament(testament)
+        self.emit('reference_changed')
 
     def set_verse(self, verse):
-        if self._vk != None:
-            self._vk.setVerse(verse)
-            self.emit('reference_changed')
+        self._vk.setVerse(verse)
+        self.emit('reference_changed')
 
     def increment_chapter(self):
-        if self._vk != None:
-            self._vk.setChapter(self._vk.getChapter()+1)
-            self.emit('reference_changed')
+        self._vk.setChapter(self._vk.getChapter()+1)
+        self.emit('reference_changed')
 
     def decrement_chapter(self):
-        if self._vk != None:
-            self._vk.setChapter(self._vk.getChapter()-1)
-            self.emit('reference_changed')
+        self._vk.setChapter(self._vk.getChapter()-1)
+        self.emit('reference_changed')
 
     def render_chapter(self):
         buf = '<h2>{} {}</h2>'.format(self.get_book_name(), self.get_chapter())

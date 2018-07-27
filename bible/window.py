@@ -101,7 +101,7 @@ class Window(Gtk.ApplicationWindow):
         self.module_list = ModuleList(self.library)
         self.module_list.connect('changed', self._on_module_selected)
 
-        install_button = Gtk.Button.new_from_icon_name('document-import', Gtk.IconSize.LARGE_TOOLBAR)
+        install_button = Gtk.Button.new_from_icon_name('applications-internet', Gtk.IconSize.LARGE_TOOLBAR)
         install_button.connect('clicked', self._on_install_button_pressed)
 
         self.header = Gtk.HeaderBar()
@@ -140,6 +140,7 @@ class Window(Gtk.ApplicationWindow):
         self.overlay.set_overlay_pass_through(self.navbar, True)
 
         self.welcome = Welcome()
+        self.welcome.connect('activated', self._on_welcome_activated)
 
         self.stack = Gtk.Stack()
         self.stack.set_size_request(600, -1)
@@ -180,6 +181,10 @@ class Window(Gtk.ApplicationWindow):
     def _on_install_button_pressed(self, button):
         install_manager = InstallManager(self.library)
         install_dialog = InstallDialog(self, install_manager)
+
+    def _on_welcome_activated(self, welcome, index):
+        if index == 0:
+            self._on_install_button_pressed(None)
 
     def _on_window_state_event(self, widget, event):
         self.settings.set_boolean('window-maximized',

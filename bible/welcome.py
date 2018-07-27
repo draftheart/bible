@@ -29,9 +29,7 @@ class Welcome(Granite.WidgetsWelcome):
         Granite.WidgetsWelcome.__init__(self,
                                         title='No Bibles Found',
                                         subtitle='Add Bibles to your library.')
-        self.append('document-import',
-                    'Import Bibles',
-                    'Import a local Bible into you library.')
+
         self.append('applications-internet',
                     'Download Bibles',
                     'Download free Bibles from the online library')
