@@ -76,9 +76,12 @@ class InstallManager(GObject.GObject):
         return
 
     def on_module_installed(self, result, error):
+        self._library.reload_modules()
+        self.refresh_module_list()
         self.emit('module-installed')
 
     def on_modules_refreshed(self, result, error):
+        self._library.reload_modules()
         self.bibles = result
         self.emit('modules-refreshed')
 

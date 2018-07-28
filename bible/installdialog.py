@@ -98,12 +98,16 @@ class InstallDialog(Gtk.Window):
         self._install_manager.refresh_module_list()
 
     def _on_modules_refreshed(self, install_manager):
-        self._populate_module_list()
+        self._refresh_module_list()
         if (self.stack.get_visible_child_name() != 'installer'):
             self.spinner.stop()
             self.stack.set_visible_child_name('installer')
 
-    def _populate_module_list(self):
+    def _refresh_module_list(self):
+        children = self.module_list.get_children()
+        for child in children:
+            child.destroy()
+
         mods = self._install_manager.bibles
         for k in mods.keys():
             mod = ModuleRow(k)
@@ -120,7 +124,7 @@ class InstallDialog(Gtk.Window):
             self.module_list.select_row(row)
 
     def _on_module_installed(self, install_manager):
-        print('Job Done!')
+        self._refresh_module_list()
 
     def _on_module_selected(self, list_box, row):
         if row != None:

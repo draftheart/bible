@@ -130,6 +130,9 @@ class Library(GObject.GObject):
             return self._module.hasEntry(vk)
         return False
 
+    def reload_modules(self):
+        return self._lib.Load()
+
     def set_book(self, book):
         self._vk.setBook(book)
         self.emit('reference_changed')
