@@ -133,4 +133,7 @@ class InstallDialog(Gtk.Window):
             self.module_info.refresh_view()
 
     def _on_moduleviewer_action_activated(self, module_viewer):
-        self._install_manager.install_selected_module()
+        if not module_viewer.installed:
+            self._install_manager.install_selected_module()
+        if module_viewer.installed:
+            self._install_manager.remove_selected_module()

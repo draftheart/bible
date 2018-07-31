@@ -32,7 +32,8 @@ class InstallManager(GObject.GObject):
     __gsignals__ = {
         'modules_refreshed': (GObject.SIGNAL_RUN_FIRST, None, ()),
         'source_list_refreshed': (GObject.SIGNAL_RUN_FIRST, None, ()),
-        'module_installed': (GObject.SIGNAL_RUN_FIRST, None, ())
+        'module_installed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'module_removed': (GObject.SIGNAL_RUN_FIRST, None, ()),
     }
 
     class ModStat:
@@ -80,6 +81,11 @@ class InstallManager(GObject.GObject):
         self.refresh_module_list()
         self.emit('module-installed')
 
+    def on_module_removed(self, result, error):
+        self._library.reload_modules()
+        self.refresh_module_list()
+        self.emit('module-removed')
+
     def on_modules_refreshed(self, result, error):
         self._library.reload_modules()
         self.bibles = result
@@ -115,8 +121,10 @@ class InstallManager(GObject.GObject):
                 self._install_manager.sources[SWBuf('CrossWire')])
         return
 
+    @async_method(on_done = lambda self, result, error: self.on_module_removed(result, error))
     def remove_selected_module(self):
-        """TODO:Implement Remove Module"""
+        if self._install_source != None:
+            self._install_manager.removeModule(self._library.get_manager(), self.get_module_name())
         return
 
     def set_selected_module(self, mod):
