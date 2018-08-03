@@ -25,12 +25,12 @@ import glob, os
 from distutils.core import setup
 from distutils.command.install_data import install_data
 
-inst_path = '/usr/share/com.github.dahenson.bible/bible'
+inst_path = '/usr/share/com.github.draftheart.bible/bible'
 
-inst_data = [('/usr/share/applications', ['data/com.github.dahenson.bible.desktop']),
-                ('/usr/share/metainfo', ['data/com.github.dahenson.bible.appdata.xml']),
-                #('/usr/share/icons/hicolor/128x128/apps',['data/com.github.dahenson.bible.svg']),
-                ('/usr/share/glib-2.0/schemas', ['data/com.github.dahenson.bible.gschema.xml']),
+inst_data = [('/usr/share/applications', ['data/com.github.draftheart.bible.desktop']),
+                ('/usr/share/metainfo', ['data/com.github.draftheart.bible.appdata.xml']),
+                #('/usr/share/icons/hicolor/128x128/apps',['data/com.github.draftheart.bible.svg']),
+                ('/usr/share/glib-2.0/schemas', ['data/com.github.draftheart.bible.gschema.xml']),
                 ('/usr/local/lib/python2.7/dist-packages', ['dist-packages/Sword.py']),
                 ('/usr/local/lib/python2.7/dist-packages', ['dist-packages/_Sword.so']),
                 (inst_path,['bible/__init__.py']),
@@ -52,9 +52,9 @@ setup(name='Bible',
       version='1.0.0',
       author='Dane Henson',
       description='The Bible Reader for elementary OS',
-      url='https://github.com/dahenson/bible',
+      url='https://github.com/draftheart/bible',
       license='GNU GPL3',
-      scripts=['com.github.dahenson.bible'],
+      scripts=['com.github.draftheart.bible'],
       packages=['bible'],
       data_files=inst_data,
       cmdclass={'install_data': post_install})
