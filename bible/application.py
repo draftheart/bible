@@ -32,11 +32,11 @@ class Application(Gtk.Application):
 
 	def __init__(self):
 		Gtk.Application.__init__(self,
-									application_id='com.github.dahenson.bible',
+									application_id='com.github.draftheart.bible',
 									flags=Gio.ApplicationFlags.FLAGS_NONE)
 		GLib.set_application_name(_("Bible"))
-		GLib.set_prgname('com.github.dahenson.bible')
-		self.settings = Gio.Settings.new('com.github.dahenson.bible')
+		GLib.set_prgname('com.github.draftheart.bible')
+		self.settings = Gio.Settings.new('com.github.draftheart.bible')
 
 		self._window = None
 

@@ -61,7 +61,7 @@ bible.GSETTINGS_SCHEMA_DIR = GSETTINGS_SCHEMA_DIR
 bible.DATA_DIR = DATA_DIR
 bible.PKG_DATA_DIR = PKG_DATA_DIR
 bible.LOCALE_DIR = LOCALE_DIR
-bible.APP_NAME = 'com.github.dahenson.bible'
+bible.APP_NAME = 'com.github.draftheart.bible'
 
 # Make sure we'll find the pygobject module, even in JHBuild
 sys.path.insert(1, '@PYTHON_EXEC_DIR@')
