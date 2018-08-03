@@ -1,28 +1,28 @@
 """
-  Copyright (c) 2018 Dane Henson (http://brainofdane.com)
+    Copyright (c) 2018 Dane Henson (http://brainofdane.com)
 
-  This file is part of Bible.
+    This file is part of Bible.
 
-  Bible is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+    Bible is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Bible is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+    Bible is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with Bible.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with Bible.  If not, see <http://www.gnu.org/licenses/>.
 
-  Authored by: Dane Henson <thegreatdane@gmail.com>
+    Authored by: Dane Henson <thegreatdane@gmail.com>
 """
 
 from gi.repository import GObject
 from Sword import SWMgr, SWModule, SWBuf, VerseKey, OSISHTMLHREF, MarkupFilterMgr
 
-import gi
+import os, gi
 gi.require_version('Gtk', '3.0')
 
 class Library(GObject.GObject):
@@ -35,12 +35,18 @@ class Library(GObject.GObject):
     def __init__(self):
         GObject.GObject.__init__(self)
         self._filter_manager = MarkupFilterMgr(10, 2)
-        self._lib = SWMgr(self._filter_manager)
+        self.setup_settings_path()
+        settings_path = os.path.join(os.path.expanduser('~'), '.sword')
+        self._lib = SWMgr(settings_path, True, self._filter_manager)
         self._lib.setGlobalOption('Headings', 'On')
 
-        self._module = self._lib.getModuleAt(0)
-        self._vk = VerseKey(self._module.getKey())
+        self._vk = VerseKey()
+        self._module = None
+
         self._make_mod_lists()
+        if len(self.bibles) > 0:
+            self._module = self._lib.getModuleAt(0)
+            self._vk = VerseKey(self._module.getKey())
 
         self._html_skele = """
         <!DOCTYPE html>
@@ -52,6 +58,11 @@ class Library(GObject.GObject):
             </body>
         </html>
         """
+
+    def setup_settings_path(self):
+        mods_path = os.path.join(os.path.expanduser('~'), '.sword', 'mods.d')
+        if not os.path.isdir(mods_path):
+            os.mkdir(mods_path)
 
     def get_book(self):
         return ord(self._vk.getBook())
@@ -101,6 +112,9 @@ class Library(GObject.GObject):
                             return [t, b, c]
         return [1, 1, 1]
 
+    def get_manager(self):
+        return self._lib
+
     def get_passage_valid(self):
         if (self._module != None):
             return self._module.hasEntry(self._vk)
@@ -116,6 +130,9 @@ class Library(GObject.GObject):
             return self._module.hasEntry(vk)
         return False
 
+    def reload_modules(self):
+        return self._lib.Load()
+
     def set_book(self, book):
         self._vk.setBook(book)
         self.emit('reference_changed')
@@ -123,6 +140,9 @@ class Library(GObject.GObject):
     def set_chapter(self, chapter):
         self._vk.setChapter(chapter)
         self.emit('reference_changed')
+
+    def set_manager(self, manager):
+        self._lib = manager
 
     def set_module(self, module):
         self._module = self._lib.getModule(module)
@@ -189,14 +209,10 @@ class Library(GObject.GObject):
 
     def _make_mod_lists(self):
         self.bibles = []
-        self.commentaries = []
-
         mods = self._lib.getModules()
+
         i = 0
-
         for mod in mods:
-
             module = self._lib.getModule(mod.c_str())
-
             if (module.getType() == self._lib.MODTYPE_BIBLES):
                 self.bibles.append([i, mod.c_str(), module.getDescription()])

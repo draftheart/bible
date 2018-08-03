@@ -26,6 +26,8 @@ from bible.passageview import PassageView
 from bible.navbar import NavBar
 from bible.modulelist import ModuleList
 from bible.welcome import Welcome
+from bible.installdialog import InstallDialog
+from bible.installmanager import InstallManager
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -99,21 +101,25 @@ class Window(Gtk.ApplicationWindow):
         self.module_list = ModuleList(self.library)
         self.module_list.connect('changed', self._on_module_selected)
 
+        install_button = Gtk.Button.new_from_icon_name('applications-internet', Gtk.IconSize.LARGE_TOOLBAR)
+        install_button.connect('clicked', self._on_install_button_pressed)
+
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
         self.header.set_title('Bible')
         self.header.pack_start(self.module_list)
+        self.header.pack_end(install_button)
         self.set_titlebar(self.header)
 
         self.book_list = BookList(self.library)
 
-        self.paned_view = Gtk.Paned(position=150)
+        self.paned_view = Gtk.Paned(position=160)
         self.paned_view.set_size_request(700, 400)
         self.restore_saved_pane_position()
 
         self.scrolled = Gtk.ScrolledWindow(None, None)
         self.scrolled.add(self.book_list)
-        self.scrolled.set_size_request(100, -1)
+        self.scrolled.set_size_request(150, -1)
 
         self.passage_view = PassageView(self.library)
 
@@ -134,6 +140,7 @@ class Window(Gtk.ApplicationWindow):
         self.overlay.set_overlay_pass_through(self.navbar, True)
 
         self.welcome = Welcome()
+        self.welcome.connect('activated', self._on_welcome_activated)
 
         self.stack = Gtk.Stack()
         self.stack.set_size_request(600, -1)
@@ -170,6 +177,14 @@ class Window(Gtk.ApplicationWindow):
         if self.window_size_update_timeout is None:
             self.window_size_update_timeout = GLib.timeout_add(500,
                     self.store_window_size_and_position, widget)
+
+    def _on_install_button_pressed(self, button):
+        install_manager = InstallManager(self.library)
+        install_dialog = InstallDialog(self, install_manager)
+
+    def _on_welcome_activated(self, welcome, index):
+        if index == 0:
+            self._on_install_button_pressed(None)
 
     def _on_window_state_event(self, widget, event):
         self.settings.set_boolean('window-maximized',
