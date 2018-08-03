@@ -46,8 +46,8 @@ class InstallManager(GObject.GObject):
 
     def __init__(self, library):
         GObject.GObject.__init__(self)
-        settings_path = os.path.join(os.path.expanduser('~'), '.sword/InstallMgr')
-        self._install_manager = InstallMgr(settings_path)
+        self.settings_path = os.path.join(os.path.expanduser('~'), '.sword/InstallMgr')
+        self._install_manager = InstallMgr(self.settings_path)
         self._install_manager.setFTPPassive(True)
         self._library = library
         self._selected_module = None

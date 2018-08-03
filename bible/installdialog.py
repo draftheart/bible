@@ -23,7 +23,6 @@ from bible.modulerow import ModuleRow
 from bible.modulelistbox import ModuleListBox
 from bible.moduleviewer import ModuleViewer
 
-import threading
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Granite', '1.0')
