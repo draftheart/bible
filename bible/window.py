@@ -40,7 +40,7 @@ class Window(Gtk.ApplicationWindow):
                                        application=app,
                                        title='Bible')
 
-        self.settings = Gio.Settings.new('com.github.dahenson.bible')
+        self.settings = Gio.Settings.new('com.github.draftheart.bible')
         self.set_size_request(300, 200)
         self.set_default_size(200, 100)
 
