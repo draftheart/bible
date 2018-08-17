@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-    <schema path="/com/github/dahenson/bible/" id="com.github.dahenson.bible" gettext-domain="com.github.dahenson.bible">
+    <schema path="/com/github/draftheart/bible/" id="com.github.draftheart.bible" gettext-domain="com.github.draftheart.bible">
         <key type="ai" name="window-size">
             <default>[768, 600]</default>
             <summary>Window size</summary>
