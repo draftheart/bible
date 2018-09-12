@@ -62,7 +62,7 @@ class Library(GObject.GObject):
     def setup_settings_path(self):
         mods_path = os.path.join(os.path.expanduser('~'), '.sword', 'mods.d')
         if not os.path.isdir(mods_path):
-            os.mkdir(mods_path)
+            os.makedirs(mods_path)
 
     def get_book(self):
         return ord(self._vk.getBook())
