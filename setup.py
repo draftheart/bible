@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 """
   Copyright (c) 2018 Dane Henson (http://brainofdane.com)
@@ -42,8 +42,8 @@ inst_data = [('/usr/share/applications', ['data/com.github.draftheart.bible.desk
                 ('/usr/share/icons/hicolor/64x64@2/apps',['data/icons/64/com.github.draftheart.bible.svg']),
                 ('/usr/share/icons/hicolor/128x128@2/apps',['data/icons/128/com.github.draftheart.bible.svg']),
                 ('/usr/share/glib-2.0/schemas', ['data/com.github.draftheart.bible.gschema.xml']),
-                ('/usr/local/lib/python2.7/dist-packages', ['dist-packages/Sword.py']),
-                ('/usr/local/lib/python2.7/dist-packages', ['dist-packages/_Sword.so']),
+                ('/usr/local/lib/python3.5/dist-packages', ['dist-packages/Sword.py']),
+                ('/usr/local/lib/python3.5/dist-packages', ['dist-packages/_Sword.so']),
                 (inst_path,['bible/__init__.py']),
                 (inst_path,['bible/application.py']),
                 (inst_path,['bible/booklist.py']),
