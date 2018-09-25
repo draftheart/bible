@@ -20,7 +20,6 @@
 """
 
 from Sword import InstallMgr, SWBuf, SWMgr
-from bible.async import async_method
 
 import os, gi
 
@@ -52,16 +51,13 @@ class InstallManager(GObject.GObject):
         self._library = library
         self._selected_module = None
 
-    @async_method(on_done = lambda self, result, error: self.on_source_list_refreshed(result, error))
     def refresh_source_list(self):
         self._install_manager.refreshRemoteSourceConfiguration()
 
-    @async_method(on_done = lambda self, result, error: self.on_install_sources_refreshed(result, error))
     def refresh_install_source(self):
         if self._install_source != None:
             self._install_manager.refreshRemoteSource(self._install_source)
 
-    @async_method(on_done = lambda self, result, error: self.on_modules_refreshed(result, error))
     def refresh_module_list(self):
         bibles = {}
         if self._library != None and self._install_source != None:
@@ -112,7 +108,6 @@ class InstallManager(GObject.GObject):
     def install_local_module(self, file):
         return
 
-    @async_method(on_done = lambda self, result, error: self.on_module_installed(result, error))
     def install_selected_module(self):
         if self._install_source != None:
             self._install_manager.installModule(self._library.get_manager(),
@@ -121,7 +116,6 @@ class InstallManager(GObject.GObject):
                 self._install_manager.sources[SWBuf('CrossWire')])
         return
 
-    @async_method(on_done = lambda self, result, error: self.on_module_removed(result, error))
     def remove_selected_module(self):
         if self._install_source != None:
             self._install_manager.removeModule(self._library.get_manager(), self.get_module_name())
