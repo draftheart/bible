@@ -28,7 +28,7 @@ from gettext import gettext as _
 class NavBar(Gtk.Revealer):
 
     def __init__(self):
-        self.css = str("""
+        self.css = b"""
             .bible-navbar GtkToolbar {
                 border: none;
                 border-radius: 4px;
@@ -45,7 +45,7 @@ class NavBar(Gtk.Revealer):
                 color: #fff;
                 background-color: transparent;
             }
-        """)
+        """
 
         Gtk.Revealer.__init__(self,
             margin=12,
